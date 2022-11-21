@@ -11,16 +11,28 @@ export async function getStaticPaths() {
         }
     }));
 }
-
+import '../styles/post.css';
 const {Content, frontmatter} = Astro.props.post;
 ---
 
 <Layout title={frontmatter.title}>
-    <main>
-        <article>
-            <div class="">
-                <Content />
+    <article class="p-32">
+        <div>
+            <h1 class="py-4 text-6xl">{frontmatter.title}</h1>
+            <p class="text-gray-700">Published: {frontmatter.publishDate}</p>
+            <div>
+                <div class="py-4 flex">
+                    {frontmatter.tags.map((tag: string) => 
+                        <a href={`/tags/${tag}`} class="flex flex-col py-2 px-4 mr-4 
+							rounded-xl font-semibold border-purple-400 border-2 text-purple-400 hover:text-white hover:bg-purple-400
+							hover:transition-all ease-in-out">{tag}</a>
+                    )}
+                </div>
             </div>
-        </article>
-    </main>
+        </div>
+        <hr class="mr-96 border-2 border-purple-400 drop-shadow-lg" />
+        <div class="py-12">
+            <Content />
+        </div>
+    </article>
 </Layout>
