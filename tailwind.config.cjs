@@ -6,7 +6,11 @@ module.exports = {
 			sans: ['Graphik', 'sans-serif'],
 			serif: ['Merriweather', 'serif']
 		},
-		extend: {},
+		extend: {
+			colors: {
+				'purple-main': 'bg-purple-500'
+			}
+		},
 	},
 	plugins: [],
 }
