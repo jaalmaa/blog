@@ -9,6 +9,7 @@ article {
 h2 {
     font-size: 2.5rem;
     padding-bottom: 0.5rem;
+    text-align: center;
 }
 
 h3 {
@@ -26,7 +27,6 @@ h4 {
 p {
     font-size: medium;
     color: #333;
-    padding-bottom: 1.5rem;
 }
 
 hr {
@@ -34,7 +34,6 @@ hr {
 }
 
 pre {
-    --background-opacity: 0.05;
     background-color: white !important;
     font-size: medium;
     padding: 1rem;
@@ -49,9 +48,20 @@ pre {
     overflow-x: auto;
     white-space: pre-wrap;
     word-wrap: break-word;
+    box-shadow: #222;
+    --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
 span {
     color: #222 !important;
     overflow-wrap: break-word;
+}
+
+img {
+    padding-left: 8rem;
+    padding-right: 8rem;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
 }
