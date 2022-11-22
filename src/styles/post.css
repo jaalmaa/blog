@@ -26,6 +26,7 @@ h4 {
 p {
     font-size: medium;
     color: #333;
+    padding-bottom: 1.5rem;
 }
 
 hr {
@@ -34,23 +35,23 @@ hr {
 
 pre {
     --background-opacity: 0.05;
-    background-color: rgb(192 132 252 / var(--background-opacity)) !important;
+    background-color: white !important;
     font-size: medium;
-    padding: 2rem;
-    padding-left: 4rem;
+    padding: 1rem;
+    padding-left: 1.5rem;
     color: #f8f8f2;
     overflow-wrap: break-all;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
     line-height: 1.5rem;
-    margin: 1rem;
-    margin-left: 4rem;
-    border-radius: 2rem;
+    border-radius: 1.5rem;
     border: 2px solid rgb(207, 178, 236);
     overflow-x: auto;
     white-space: pre-wrap;
     word-wrap: break-word;
-  }
+}
 
 span {
     color: #222 !important;
     overflow-wrap: break-word;
-  }
+}
