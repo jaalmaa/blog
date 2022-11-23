@@ -9,12 +9,13 @@ article {
 h2 {
     font-size: 2.5rem;
     padding-bottom: 0.5rem;
+    padding-top: 2.5rem;
     text-align: center;
 }
 
 h3 {
     font-size: 2rem;
-    padding-top: 0.5rem;
+    padding-top: 1.5rem;
     padding-bottom: 0.5rem;
 }
 
@@ -25,8 +26,10 @@ h4 {
 }
 
 p {
-    font-size: medium;
+    font-size: large;
     color: #333;
+    padding-top:1rem;
+    padding-bottom: 1rem;
 }
 
 hr {
@@ -60,8 +63,37 @@ span {
 }
 
 img {
-    padding-left: 8rem;
-    padding-right: 8rem;
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    display: block;
+    margin-left:auto;
+    margin-right: auto;
+    max-width: 100%;
+    box-shadow: #222;
+    --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+ul {
+    list-style: none;
+    padding-left: 2rem;
+    color: #333;
+    font-size: large;
+}
+
+ul li::before {
+    content: "\2022";
+    color: rgb(146, 50, 243);
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+  }
+
+a {
+    color:rgb(146, 50, 243)
+}
+
+a:hover {
+    color: rgb(168, 97, 238);
 }

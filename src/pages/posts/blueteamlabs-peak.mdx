@@ -1,0 +1,181 @@
+---
+title: 'BlueTeamLabs Investigation: Peak'
+emoji: '⛰️'
+slug: 'blueteamlabs-peak'
+publishDate: '2022-11-23 06:00:00'
+excerpt: 'In this scenario, a developer, Dwight, at a fictional company Mountain Top Solutions has noticed some anomalous activity on the application development server. It is our job as an analyst to investigate this anomalous activity to find evidence of a potential intrusion.'
+tags: ['BlueTeamLabs Writeup', 'Security Operations', 'Log Analysis']
+---
+
+## Introduction
+
+In this scenario, a developer, Dwight, at a fictional company Mountain Top Solutions has noticed some anomalous activity on the application development server. It is our job as an analyst to investigate this anomalous activity to find evidence of a potential intrusion.
+
+
+Furthermore, the developer has given us the following leads to conduct our investigation:
+
+* The server should only be accessed from Dwight's laptop via SSH from the IP range `192.168.1.0/24`.
+* Anomalous activity has been observed from a host with the IP address `10.X.X.X`.
+
+The following log sources were given for investigation:
+
+- `access.log` from Apache
+- Auditd logs
+- The system's `auth.log`
+- syslog
+
+The investigation is carried out using the company's SIEM solution based on the Elastic Stack.
+
+## Analysis
+
+### Initial Access - Web Server
+
+The host of interest, named `APPSERV-Chicago` is believed to be compromised. Fortunately, the Apache `access.log` parses the client IP address of the host connecting to the server, so this is a good starting point for gathering a list of the hosts that previously connected to the affected server.
+
+![source IPs](/images/blueteamlabs-peak/btl-peak-01.png)
+
+A large volume of suspicious activity is observed from the IP address `10.0.2.5`, which is believed to be the address for the malicious actor as it deviates from the hosts expected to be connecting to this server. The only authorized host to access this server is the developer's laptop, which is in the subnet `192.168.1.0/24`. Therefore a deeper investigation into the activity carried out by this host is warranted.
+
+This anomalous IP address can now be used as a pivot point to uncover more activity on the network. Firstly, `access.log` can be filtered based on this IP address to get an understanding of the host's interaction with the webserver.
+
+```
+Source: apache_log
+Query: clientip: 10.0.2.5
+```
+
+The aggregations in Kibana allow for a quick overview of the type of activity carried out by this suspicious host towards the webserver. 
+These are summarized below:
+
+![accessed endpoints](images/blueteamlabs-peak/btl-peak-02.png)
+
+![user agents](/images/blueteamlabs-peak/btl-peak-03.png)
+
+This activity indicates that, based on the user agent in the requests, the suspicious IP address is attempting to perform a brute-force attack on the WordPress login page for the webserver using the popular brute-force tool Hydra. The anomalous activity on the network is now confirmed as malicious activity.
+
+Each of these login attempts results in a `HTTP 200` response code, which indicates an unsuccessful login to the WordPress site. This may seem counterintuitive as a `200` status code indicates a successful response for a requested resource, however this corresponds to a successful request for the login page, which would be requested after a failed login. Instead, a successful login results in a `302` status code as the user is redirected to the Wordpress dashboard following a successful login. 
+
+The following query can be used to search for successful logins to the website from the malicious host:
+
+```
+Source: apache_logs
+Query: clientip: "10.0.2.5" and uri: "/blog/wp-login.php" and "302"
+```
+
+![successful logins](/images/blueteamlabs-peak/btl-peak-04.png)
+
+There were no requests to the login page that resulted in a `HTTP 302` status code, which would have been expected following a successful login. Therefore, we can conclude that the attacker did not gain access to WordPress.
+
+### Initial Access - SSH
+
+Although access was not granted to the attacker via the webserver via WordPress, it is important review other possible sources of compromise on the system. In this case, SSH is also exposed to the network, as the developer uses it to interact with the system. Therefore, the SSH logs should be checked to confirm whether or not the attacker was able to gain access to the system via SSH.
+
+The `auth.log` log file can be used to query information related to remote logins to the system via SSH. None of the fields from this log source are parsed in ElasticSearch, therefore particular strings are searched from the raw log message. In this case, logs related to attempted SSH logins contain the message `Connection from <Remote IP>` so the following query will find attempted logins from the malicious IP address.
+
+```
+Source: auth
+Query: "Connection from 10.0.2.5"
+```
+
+![attempted SSH logins](/images/blueteamlabs-peak/btl-peak-05.png)
+
+As the above screenshot shows, there are attempted SSH logins from the malicious IP address towards the server on port 44322. This must be the port on which the SSH server is listening.
+Furthermore, we can confirm whether or not the attacker was able to gain access to the server using the following query:
+
+```
+Source: auth
+Query: "10.0.2.5" and "Accepted"
+```
+
+![successful SSH logins](/images/blueteamlabs-peak/btl-peak-06.png)
+
+The threat actor was able to log in to the account `vagrant` on the server via SSH using a password. Therefore we can conclude that the malicious actor was able to successfully compromise the webserver. There were successful logins at the following times:
+
+* Feb 4, 2021 at 10:07:06
+* Feb 4, 2021 at 10:04:51
+
+### Post Compromise - System Enumeration
+
+Now the initial compromise vector has been confirmed, it is time to investigate the activity performed by the attacker post-compromise. The command line activity on this server is logged via auditd, and the logs of commands issued on the system can be found using the `EXECVE` type. After filtering the results for after the login at 10:07:06, there were a lot of `sed` and `awk` commands so those results were filtered out.
+
+```
+Source: auditd
+Query: type: "EXECVE" and not ("sed" or "awk")
+```
+
+![issued commands](/images/blueteamlabs-peak/btl-peak-07.png)
+
+After searching from the time 10:07:06 onwards, the first human-looking command was run at 10:07:11 which was `ls --color=auto`. These commands are consistent with initial, host-based, reconaissance and information gathering. The following commands were executed following the SSH login:
+
+* `ls --color=auto`
+* `id`
+* `uname -a`
+* `cat /etc/passwd`
+
+The next thing to look for is any files downloaded by the attacker. On Linux systems, files are commonly downloaded from the internet using the commands wget or curl, so the following query is used to search for these commands:
+
+```
+Source: auditd
+Query: type: "EXECVE" and ("wget" or "curl")
+```
+
+![linPEAS download](/images/blueteamlabs-peak/btl-peak-08.png)
+
+The threat actor downloaded `linpeas.sh`, which is a popular privilege escalation enumeration script. This script was downloaded using `wget` from the following URL:
+
+```
+hxxps://raw.githubusercontent[.]com/carlospolop/privilege-escalation-awesome-scripts-suite/master/linPEAS/linpeas.sh
+```
+
+The script was then executed using `bash`.
+
+![linPEAS execution](/images/blueteamlabs-peak/btl-peak-09.png)
+
+### Post Compromise - Privilege Escalation
+
+The attacker attempted to escalate privileges by downloading an exploit script from ExploitDB, which is a popular repository for publicly available exploit code, and saved it to the file `49521`.
+
+![exploit download](/images/blueteamlabs-peak/btl-peak-10.png)
+
+The exploit script downloaded can be found [here](https://www.exploit-db.com/exploits/49521). It is a script to exploit CVE-2021-3156, which is a vulnerability in `sudo 1.9.5p1` that allows for local privilege escalation on a vulnerable host. The attacker attempted to run the exploit to escalate privileges to the user account `root`.
+
+![exploit execution](/images/blueteamlabs-peak/btl-peak-11.png)
+
+List of commands run to execute the exploit code:
+
+* `mv 49521 49521.py`
+* `python3 49521.py`
+* `python3 49521.py fakepasswd -target /etc/passwd`
+
+### Post Compromise - Data Exfiltration
+
+Following the attempt to escalate privileges, the attacker downloaded another script named `upload_btlo.sh` from their own infrastructure, that was proxied by leveraging the service Ngrok.
+
+![exfil script download](/images/blueteamlabs-peak/btl-peak-12.png)
+
+Now we have a network indicator to pivot from to uncover further activity related to the attacker; `134430fcb321.ngrok[.]io`.
+
+```
+Source: auditd
+Query: type: "EXECVE" and "134430fcb321.ngrok.io"
+```
+
+The threat actor uploaded the files `/etc/passwd` and `/tmp/btlo.zip` to URL `hxxps://134430fcb321.ngrok[.]io/upload` using the `curl` utility.
+
+![exfiltration](/images/blueteamlabs-peak/btl-peak-13.png)
+
+The file `btlo.zip` contains the contents of the `/usr/share/wordpress`, which was compressed using the command `zip -e -r btlo.zip /usr/share/wordpress/*`.
+
+![btlo.zip compression](/images/blueteamlabs-peak/btl-peak-14.png)
+
+### Post Compromise - Defense Evasion & Anti Forensics
+
+Following the successful exfiltration of files from the system, the attacker then proceeds to cover their tracks by deleting the files downloaded to the system.
+
+![deleting files](/images/blueteamlabs-peak/btl-peak-15.png)
+
+The threat actor deleted the following files from the system:
+
+* `49521.py`
+* `btlo.zip`
+* `fakepasswd`
+* `linpeas.sh`
