@@ -28,68 +28,54 @@ import '../styles/global.css';
 		<div>
 			<h2 class="font-extrabold bg-clip-text text-6xl p-8">Recent Posts</h2>
 			<hr />
-			<div class="m-2 flex">
+			<div class="flex flex-row w-full min-h-fit">
 				{recentPosts.slice(0,2).map(post =>
-					<a href={`/${post.frontmatter.slug}`}>
-						<article> {/*todo: extract this to card component*/}
-							<div class="flex flex-col m-4
-							shadow-l border-2 border-l-purple-200 rounded-xl border-white bg-white transition-all ease-in-out
-							hover:bg-purple-100 hover:bg-opacity-40 hover:border-2 hover:border-purple-300">
-								<div class="p-12 transition ease-in-out hover:translate-y-0.5">
-									<div class="text-left">
-										<h3 class="text-xl font-bold">{post.frontmatter.title}</h3>
-										<p class="text-gray-500 pb-2">Published: {post.frontmatter.publishDate}</p>
-										<hr />
-									</div>
-									<div class="m-4 flex">
-										<p>{post.frontmatter.excerpt}</p>
-									</div>
-									<div class="flex w-full">
-										{post.frontmatter.tags.map((tag: string) =>
-											<a href={`/tags/${tag}`}>
-												<div class="flex flex-col py-2 px-4 m-2 
-													rounded-xl font-semibold border-purple-400 border-2 text-purple-400 hover:text-white hover:bg-purple-400
-													hover:transition-all ease-in-out">
-													{tag}
-												</div>
-											</a>
-										)}
-									</div>
-								</div>
-							</div>
-						</article>
-					</a>
-				)}
-			</div>
-			<div class="m-2 mr-10 flex h-96">
-				<a href={`/${posts[2].frontmatter.slug}`}>
-					<article>
-						<div class="my-2 mx-4 w-full max-h-min text-left
-						shadow-l border-2 border-l-purple-200 rounded-xl border-white bg-white transition-all ease-in-out
-							hover:bg-purple-100 hover:bg-opacity-40 hover:border-2 hover:border-purple-300">
-							<div class="p-12 transition ease-in-out hover:translate-y-0.5">
+					<div class="w-1/2 m-4 shadow-l border-2 border-l-purple-200 rounded-xl border-white bg-white transition-all ease-in-out hover:bg-purple-100 hover:bg-opacity-40 hover:border-2 hover:border-purple-300">
+						<a href={`/${post.frontmatter.slug}`}>
+							<div class="p-12 transition ease-in-out hover:translate-y-0.5 flex flex-col justify-between">
 								<div class="text-left">
-									<h3 class="text-xl font-bold">{posts[2].frontmatter.title}</h3>
-									<p class="text-gray-500 pb-2">Published: {posts[2].frontmatter.publishDate}</p>
-									<hr />
+									<h3 class="text-xl font-bold">{post.frontmatter.title}</h3>
+									<p class="text-gray-500 pb-2">Published: {post.frontmatter.publishDate}</p>
+									<hr class="border-1 border-purple-400 drop-shadow-lg" />
 								</div>
-								<div class="py-4 flex">
-									<p>{posts[2].frontmatter.excerpt}</p>
+								<div class="m-4">
+									<p>{post.frontmatter.excerpt}</p>
 								</div>
-								<div class="flex w-full">
-									{posts[2].frontmatter.tags.map((tag: string) =>
+								<div class="flex flex-row justify-end h-full">
+									{post.frontmatter.tags.map((tag: string) =>
 										<a href={`/tags/${tag}`}>
-											<div class="flex flex-col py-2 px-4 m-2 
-												rounded-xl font-semibold border-purple-400 border-2 text-purple-400 hover:text-white hover:bg-purple-400
-												hover:transition-all ease-in-out">
+											<div class="py-2 px-4 m-2 shadow-lg rounded-xl font-semibold hover:shadow-none border-purple-400 border-2 text-purple-400 hover:text-white hover:bg-purple-400 hover:transition-all ease-in-out">
 												{tag}
 											</div>
 										</a>
 									)}
 								</div>
 							</div>
+						</a>
+					</div>
+				)}
+			</div>
+				<div class="min-h-fit text-left m-4 shadow-l border-2 border-l-purple-200 rounded-xl border-white bg-white transition-all ease-in-out hover:bg-purple-100 hover:bg-opacity-40 hover:border-2 hover:border-purple-300">
+					<a href={`/${posts[2].frontmatter.slug}`}>
+					<div class="p-12 transition ease-in-out hover:translate-y-0.5">
+						<div class="text-left">
+							<h3 class="text-xl font-bold">{posts[2].frontmatter.title}</h3>
+							<p class="text-gray-500 pb-2">Published: {posts[2].frontmatter.publishDate}</p>
+							<hr class="border-1 border-purple-400 drop-shadow-lg" />
 						</div>
-					</article>
+						<div class="py-4 flex">
+							<p>{posts[2].frontmatter.excerpt}</p>
+						</div>
+						<div class="flex w-full">
+							{posts[2].frontmatter.tags.map((tag: string) =>
+								<a href={`/tags/${tag}`}>
+									<div class="flex flex-col py-2 px-4 m-2 rounded-xl font-semibold border-purple-400 border-2 text-purple-400 hover:text-white hover:bg-purple-400 hover:transition-all ease-in-out">
+										{tag}
+									</div>
+								</a>
+							)}
+						</div>
+					</div>
 				</a>
 			</div>
 		</div>
