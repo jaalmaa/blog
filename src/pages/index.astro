@@ -10,6 +10,7 @@ export interface frontmatter {
 import Layout from '@layouts/Layout.astro';
 import PostCard from '@components/PostCard.astro'
 const posts = await Astro.glob<frontmatter>('./posts/*.mdx');
+posts.sort((a, b) => Date.parse(b.frontmatter.publishDate) - Date.parse(a.frontmatter.publishDate));
 const recentPosts = posts.slice(0, 3);
 import '../styles/global.css';
 ---
