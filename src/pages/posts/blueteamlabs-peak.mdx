@@ -7,7 +7,7 @@ excerpt: 'In this scenario, a developer, Dwight, at a fictional company Mountain
 tags: ['BlueTeamLabs Writeup', 'Security Operations', 'Log Analysis']
 ---
 
-## Introduction
+# Introduction
 
 In this scenario, a developer, Dwight, at a fictional company Mountain Top Solutions has noticed some anomalous activity on the application development server. It is our job as an analyst to investigate this anomalous activity to find evidence of a potential intrusion.
 
@@ -26,9 +26,9 @@ The following log sources were given for investigation:
 
 The investigation is carried out using the company's SIEM solution based on the Elastic Stack.
 
-## Analysis
+# Analysis
 
-### Initial Access - Web Server
+## Initial Access - Web Server
 
 The host of interest, named `APPSERV-Chicago` is believed to be compromised. Fortunately, the Apache `access.log` parses the client IP address of the host connecting to the server, so this is a good starting point for gathering a list of the hosts that previously connected to the affected server.
 
@@ -65,7 +65,7 @@ Query: clientip: "10.0.2.5" and uri: "/blog/wp-login.php" and "302"
 
 There were no requests to the login page that resulted in a `HTTP 302` status code, which would have been expected following a successful login. Therefore, we can conclude that the attacker did not gain access to WordPress.
 
-### Initial Access - SSH
+## Initial Access - SSH
 
 Although access was not granted to the attacker via the webserver via WordPress, it is important review other possible sources of compromise on the system. In this case, SSH is also exposed to the network, as the developer uses it to interact with the system. Therefore, the SSH logs should be checked to confirm whether or not the attacker was able to gain access to the system via SSH.
 
@@ -93,7 +93,7 @@ The threat actor was able to log in to the account `vagrant` on the server via S
 * Feb 4, 2021 at 10:07:06
 * Feb 4, 2021 at 10:04:51
 
-### Post Compromise - System Enumeration
+## Post Compromise - System Enumeration
 
 Now the initial compromise vector has been confirmed, it is time to investigate the activity performed by the attacker post-compromise. The command line activity on this server is logged via auditd, and the logs of commands issued on the system can be found using the `EXECVE` type. After filtering the results for after the login at 10:07:06, there were a lot of `sed` and `awk` commands so those results were filtered out.
 
@@ -130,7 +130,7 @@ The script was then executed using `bash`.
 
 ![linPEAS execution](/images/blueteamlabs-peak/btl-peak-09.png)
 
-### Post Compromise - Privilege Escalation
+## Post Compromise - Privilege Escalation
 
 The attacker attempted to escalate privileges by downloading an exploit script from ExploitDB, which is a popular repository for publicly available exploit code, and saved it to the file `49521`.
 
@@ -146,7 +146,7 @@ List of commands run to execute the exploit code:
 * `python3 49521.py`
 * `python3 49521.py fakepasswd -target /etc/passwd`
 
-### Post Compromise - Data Exfiltration
+## Post Compromise - Data Exfiltration
 
 Following the attempt to escalate privileges, the attacker downloaded another script named `upload_btlo.sh` from their own infrastructure, that was proxied by leveraging the service Ngrok.
 
@@ -167,7 +167,7 @@ The file `btlo.zip` contains the contents of the `/usr/share/wordpress`, which w
 
 ![btlo.zip compression](/images/blueteamlabs-peak/btl-peak-14.png)
 
-### Post Compromise - Defense Evasion & Anti Forensics
+## Post Compromise - Defense Evasion & Anti Forensics
 
 Following the successful exfiltration of files from the system, the attacker then proceeds to cover their tracks by deleting the files downloaded to the system.
 

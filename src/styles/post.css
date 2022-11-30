@@ -1,3 +1,7 @@
+html {
+    scroll-behavior: smooth;
+}
+
 article {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     text-align: left;
@@ -6,20 +10,21 @@ article {
     width: 100%;
 }
 
-h2 {
+h1 {
     font-size: 2.5rem;
+    font-weight: 600;
     padding-bottom: 0.5rem;
     padding-top: 2.5rem;
     text-align: center;
 }
 
-h3 {
+h2 {
     font-size: 2rem;
     padding-top: 1.5rem;
     padding-bottom: 0.5rem;
 }
 
-h4 {
+h3 {
     font-size: 1.5rem;
     padding-bottom: 0.25rem;
     padding-top: 0.25rem;
@@ -41,7 +46,6 @@ pre {
     font-size: medium;
     padding: 1rem;
     padding-left: 1.5rem;
-    color: #f8f8f2;
     overflow-wrap: break-all;
     margin-top: 1rem;
     margin-bottom: 1rem;
@@ -58,7 +62,7 @@ pre {
 }
 
 span {
-    color: #222 !important;
+    color: rgb(107 33 168) !important;
     overflow-wrap: break-word;
 }
 
@@ -78,7 +82,7 @@ img {
 ul {
     list-style: none;
     padding-left: 2rem;
-    color: #333;
+    color: rgb(107 33 168) !important;
     font-size: large;
 }
 
@@ -87,7 +91,8 @@ ul li::before {
     color: rgb(146, 50, 243);
     font-weight: bold;
     display: inline-block;
-    width: 1em;
+    width: 3rem;
+    margin: 0.2rem;
   }
 
 a {
@@ -96,4 +101,19 @@ a {
 
 a:hover {
     color: rgb(168, 97, 238);
+}
+
+p > code {
+    color: rgb(107 33 168) !important;
+    border: 2px solid rgb(207, 178, 236);
+    border-radius: 0.5rem;
+    padding: 0.125rem 0.4rem;
+    
+}
+
+li > code {
+    color: rgb(107 33 168) !important;
+    border: 2px solid rgb(207, 178, 236);
+    border-radius: 0.5rem;
+    padding: 0.125rem 0.4rem;
 }
