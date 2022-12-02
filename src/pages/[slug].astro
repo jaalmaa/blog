@@ -33,10 +33,10 @@ const readableDate = new Date(frontmatter.publishDate).toLocaleString().split(",
                 <i class="text-gray-700">Published: { readableDate }</i>
                 <div>
                     <div class="flex">
-                        { frontmatter.tags.map((tag: string) => 
-                            <a href={`/tags/${ tag }`} class="flex flex-col py-2 px-4 my-4 mr-2
+                        { frontmatter.categories.map((category: string) => 
+                            <a href={`/categories/${ category }`} class="flex flex-col py-2 px-4 my-4 mr-2
                                 rounded-xl font-semibold border-purple-400 border-2 text-purple-400 hover:text-white hover:bg-purple-400
-                                hover:transition-all ease-in-out">{ tag }</a>
+                                hover:transition-all ease-in-out">{ category }</a>
                         )}
                     </div>
                 </div>

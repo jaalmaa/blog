@@ -14,10 +14,10 @@ const { post } = Astro.props;
                 <p class="line-clamp-3">{post.frontmatter.excerpt}</p>
             </div>
             <div class="flex flex-row justify-end h-full">
-                {post.frontmatter.tags.map((tag: string) =>
-                    <a href={`/tags/${tag}`}>
+                {post.frontmatter.categories.map((category: string) =>
+                    <a href={`/categories/${category}`}>
                         <div class="py-2 px-4 m-2 shadow-lg rounded-xl font-semibold hover:shadow-none border-purple-400 border-2 text-purple-400 hover:text-white hover:bg-purple-400 hover:transition-all ease-in-out">
-                            {tag}
+                            {category.replaceAll('-', ' ')}
                         </div>
                     </a>
                 )}
