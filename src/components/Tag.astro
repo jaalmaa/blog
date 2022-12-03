@@ -1,0 +1,9 @@
+---
+const { text } = Astro.props;
+---
+
+<a href={`/categories/${text}`}>
+    <div class="py-2 px-4 m-2 shadow-lg rounded-xl font-medium hover:shadow-none border-purple-400 border-2 text-purple-400 hover:text-white hover:bg-purple-400 hover:transition-all ease-in-out">
+        {text.replaceAll('-', ' ')}
+    </div>
+</a>

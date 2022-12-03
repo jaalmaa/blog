@@ -1,6 +1,8 @@
 ---
 import Layout from '@layouts/Layout.astro';
 import PostNav from '@components/PostNav.astro';
+import TagsList from '@components/TagsList.astro';
+import '../styles/post.css';
 
 export async function getStaticPaths() {
     const posts = await Astro.glob('./posts/*.mdx');
@@ -13,12 +15,12 @@ export async function getStaticPaths() {
         }
     }));
 }
-import '../styles/post.css';
+
 const { Content, frontmatter } = Astro.props.post;
 /* get array of headings for building the article nav component */
-const headings = await Astro.props.post.getHeadings();
+const headings: string[] = await Astro.props.post.getHeadings();
 /* Convert date in post frontmatter to date object render as a readable string */
-const readableDate = new Date(frontmatter.publishDate).toLocaleString().split(",").slice(0,1);
+const readableDate: string[] = new Date(frontmatter.publishDate).toLocaleString().split(",").slice(0,1);
 ---
 
 <Layout title={ frontmatter.title }>
@@ -32,16 +34,10 @@ const readableDate = new Date(frontmatter.publishDate).toLocaleString().split(",
                 <h1 class="text-6xl text-left py-4 font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">{ frontmatter.title }</h1>
                 <i class="text-gray-700">Published: { readableDate }</i>
                 <div>
-                    <div class="flex">
-                        { frontmatter.categories.map((category: string) => 
-                            <a href={`/categories/${ category }`} class="flex flex-col py-2 px-4 my-4 mr-2
-                                rounded-xl font-semibold border-purple-400 border-2 text-purple-400 hover:text-white hover:bg-purple-400
-                                hover:transition-all ease-in-out">{ category }</a>
-                        )}
-                    </div>
+                    <TagsList categories={ frontmatter.categories } />
                 </div>
             </div>
-            <hr class="mr-96 border-2 border-purple-400 drop-shadow-lg" />
+            <hr class="border-2 mt-2 border-purple-400 drop-shadow-lg" />
             <div class="py-12">
                 <Content />
             </div>
