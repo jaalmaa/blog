@@ -3,7 +3,7 @@ import TagsList from "@components/TagsList.astro";
 const { post } = Astro.props;
 ---
 
-<div class="w-full m-2 border-2 border-l-purple-200 rounded-xl border-white bg-white transition-all ease-in-out hover:bg-purple-100 hover:bg-opacity-40 hover:border-2 hover:border-purple-300">
+<div class="w-full min-h-fit m-2 border-2 border-l-purple-200 rounded-xl border-white bg-white transition-all ease-in-out hover:bg-purple-100 hover:bg-opacity-40 hover:border-2 hover:border-purple-300">
     <a href={`/${ post.frontmatter.slug }`}>
         <div class="p-8 transition ease-in-out hover:translate-y-0.5 flex flex-col justify-between">
             <div class="text-left">
@@ -14,7 +14,9 @@ const { post } = Astro.props;
             <div class="m-4 text-left">
                 <p class="line-clamp-3">{ post.frontmatter.excerpt }</p>
             </div>
-            <TagsList categories={ post.frontmatter.categories } />
+            <div class="">
+                <TagsList categories={ post.frontmatter.categories } />
+            </div>
         </div>
     </a>
 </div>

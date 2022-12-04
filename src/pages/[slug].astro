@@ -24,14 +24,14 @@ const readableDate: string[] = new Date(frontmatter.publishDate).toLocaleString(
 ---
 
 <Layout title={ frontmatter.title }>
-    <div class="flex flex-row mr-48">
-        <div class="w-1/4 shadow-lg bg-purple-50 bg-opacity-30 rounded-2xl">
+    <div class="lg:flex lg:flex-row lg:mr-48">
+        <div class="lg:w-1/4 shadow-lg bg-purple-50 bg-opacity-30 rounded-2xl">
             <PostNav headings={ headings } />
         </div>
-        <article class="pt-8 pl-48 pr-48 w-3/4">
+        <article class="pt-8 lg:pl-48 lg:pr-48 lg:w-3/4">
             <div>
-                <h1 class="text-8xl text-left">{ frontmatter.emoji }</h1>
-                <h1 class="text-6xl text-left py-4 font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">{ frontmatter.title }</h1>
+                <h1 class="lg:text-8xl text-left">{ frontmatter.emoji }</h1>
+                <h1 class="lg:text-6xl text-left py-4 font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">{ frontmatter.title }</h1>
                 <i class="text-gray-700">Published: { readableDate }</i>
                 <div>
                     <TagsList categories={ frontmatter.categories } />
