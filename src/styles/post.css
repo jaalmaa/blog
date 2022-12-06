@@ -31,10 +31,11 @@ h3 {
 }
 
 p {
-    font-size: large;
-    color: #333;
-    padding-top:1rem;
-    padding-bottom: 1rem;
+    font-size: medium;
+    color: rgb(59, 69, 78);
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    line-height: 1.75rem;
 }
 
 hr {
@@ -66,8 +67,8 @@ span {
 }
 
 img {
-    margin-top: 2rem;
-    margin-bottom: 2rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
     display: block;
     margin-left:auto;
     margin-right: auto;

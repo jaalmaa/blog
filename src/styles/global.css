@@ -4,13 +4,11 @@
 
 html {
     background-color: #F6F6F6;
+    font-size: 100%;
 }
 
 body {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
-    margin: auto;
-    padding: 2em;
-    text-align: left;
     background-color: #fff;
     word-wrap: break-word;
     overflow-wrap: break-word;

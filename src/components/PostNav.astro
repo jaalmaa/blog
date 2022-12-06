@@ -12,7 +12,7 @@ const { headings } = Astro.props;
     { headings.map((heading: any) => 
         <a href={`#${heading.slug}`}>
             <div class="hover:text-white hover:bg-purple-100 transition ease-in-out hover:translate-x-0.5 rounded-2xl px-2">
-                { heading.depth === 1 ? <p class="text-lg">{ heading.text }</p> : <p class="text-sm ml-8">{ heading.text }</p> }
+                { heading.depth === 1 ? <p class="text-xl">{ heading.text }</p> : <p class="text-md ml-8">{ heading.text }</p> }
             </div>
         </a>
     )}
