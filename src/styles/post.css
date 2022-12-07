@@ -83,7 +83,7 @@ ul {
     list-style: none;
     padding-left: 2rem;
     color: rgb(107 33 168) !important;
-    font-size: large;
+    font-size: medium;
 }
 
 ul li::before {
