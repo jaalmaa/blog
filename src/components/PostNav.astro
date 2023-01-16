@@ -1,17 +1,13 @@
 ---
-import '../styles/global.css';
-import HomeButton from './HomeButton.astro';
-
 const { headings } = Astro.props;
 ---
 
 <div class="w-full p-4 sticky top-16 rounded-xl">
-    <HomeButton to={ "/" } />
-    <p class="text-center font-medium text-xl text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">On this page</p>
+    <p class="text-center font-medium text-xl text-gradient">On this page</p>
     { headings.map((heading: any) => 
         <a href={`#${heading.slug}`}>
             <div class="hover:text-white hover:bg-purple-100 transition ease-in-out hover:translate-x-0.5 rounded-2xl px-2">
-                { heading.depth === 1 ? <p class="text-xl">{ heading.text }</p> : <p class="text-md ml-8">{ heading.text }</p> }
+                { heading.depth === 1 ? <p class="lg:text-xl">{ heading.text }</p> : <p class="ml-8 hidden lg:block">{ heading.text }</p> }
             </div>
         </a>
     )}

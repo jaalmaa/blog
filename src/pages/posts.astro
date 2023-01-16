@@ -3,17 +3,16 @@ import Layout from '@layouts/Layout.astro';
 import PostCard from '@components/PostCard.astro';
 import HomeButton from '@components/HomeButton.astro';
 import type { frontmatter } from './index.astro';
-import '../styles/global.css';
 
 const posts = await Astro.glob<frontmatter>('./posts/*.mdx')
 posts.sort((a, b) => Date.parse(b.frontmatter.publishDate) - Date.parse(a.frontmatter.publishDate));
 ---
 
 <Layout title="Posts">
-    <div class="min-h-screen lg:mx-72 mx-auto p-2">
+    <div class="lg:mx-72 px-2">
         <HomeButton to={ "/" } />
         <div class="text-center">
-            <h1 class="lg:text-6xl text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">All Posts</h1>
+            <h1 class="lg:text-5xl text-xl font-medium text-gradient">All Posts</h1>
             <div>
                 { posts.map((post: any) =>
                     <PostCard post={ post } />

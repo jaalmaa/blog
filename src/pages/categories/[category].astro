@@ -34,10 +34,10 @@ const displayedCategory = category.replaceAll('-', ' ');
 ---
 
 <Layout title={"Category: " + displayedCategory}>
-    <div class="min-h-full lg:mx-72 p-2">   <!-- page container -->
+    <div class="lg:mx-72 px-2">   <!-- page container -->
         <HomeButton to={ "/" } />
-        <h1 class="py-4 text-center lg:text-5xl text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Category: { displayedCategory }</h1>
-        <div class="p-4"> <!-- container for tag buttons -->
+        <h1 class="py-4 text-center text-gradient lg:text-5xl text-xl">Category: { displayedCategory }</h1>
+        <div class="p-4 hidden lg:block"> <!-- container for tag buttons, hidden on mobile -->
             <p>All Categories:</p>
             <TagsList categories={ uniqueCategoriesList } />
         </div>

@@ -2,17 +2,14 @@
 import Layout from '@layouts/Layout.astro';
 import PostNav from '@components/PostNav.astro';
 import TagsList from '@components/TagsList.astro';
+import HomeButton from '@components/HomeButton.astro';
 import '../styles/post.css';
 
 export async function getStaticPaths() {
     const posts = await Astro.glob('./posts/*.mdx');
     return posts.map(post => ({
-        params: {
-            slug: post.frontmatter.slug
-        },
-        props: {
-            post
-        }
+        params: { slug: post.frontmatter.slug },
+        props: { post }
     }));
 }
 
@@ -29,10 +26,11 @@ const readableDate: string[] = new Date(frontmatter.publishDate).toLocaleString(
             <PostNav headings={ headings } />
         </div>
         <article class="pt-8 lg:pl-48 lg:pr-48 lg:w-3/4">
+            <HomeButton to={ "/" } />
             <div>
                 <h1 class="lg:text-6xl text-left">{ frontmatter.emoji }</h1>
-                <h1 class="lg:text-5xl text-left py-4 font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">{ frontmatter.title }</h1>
-                <i class="text-gray-700 text-md">Published: { readableDate }</i>
+                <h1 class="lg:text-5xl text-2xl text-left text-gradient py-4">{ frontmatter.title }</h1>
+                <i class="text-gray-700">Published: { readableDate }</i>
                 <div>
                     <TagsList categories={ frontmatter.categories } />
                 </div>
