@@ -21,24 +21,24 @@ The phishing site is located at the URL `hxxp://securedocument[.]net/secure/L0GI
 
 The page is an attempt at copying an Office365 secure document transfer website and asks the user to provide their O365 credentials to view the shared file.
 
-![screenshot of the phishing website](/images/blueteamlabs-phishyv1/phishy-01.png)
+![screenshot of the phishing website](https://imgur.com/Z6Ac2Aq.png)
 
 The top left of the page says Microsoft Docs. While this does exist, Microsoft Docs is used for Microsoft's documentation on its products and not for document transfers. The website also uses HTTP and not HTTPS, as would be expected from a legitimate website.
 
 Viewing the page's HTML code reveals a suspicious PHP file named `jeff.php` to which the credentials entered into the login form are sent.
 
-![screenshot of the HTML page source](/images/blueteamlabs-phishyv1/phishy-02.png)
+![screenshot of the HTML page source](https://imgur.com/QYVa3G7.png)
 
 
 The HTML comments contain the phrase `Thanks to PHP Bloke`. This text would good to use as a pivot to uncover other phishing websites in the wild using this kit, or similar.
 
 If we view the source for the webpage CSS at `style.css`. The background behind the login form is actually an image named `axCBhIt.png`, not any HTML content.
 
-![screenshot of the webpage CSS](/images/blueteamlabs-phishyv1/phishy-03.png)
+![screenshot of the webpage CSS](https://imgur.com/5I4vKMf.png)
 
 The webpage background image `axCBhIt.png`:
 
-![phishing page background image](/images/blueteamlabs-phishyv1/phishy-04.png)
+![phishing page background image](https://imgur.com/19WUriN.png)
 
 These factors, and others, combined with the non-Microsoft URL prove in no uncertain terms that this is not a legitimate Office 365 file transfer website and is definitely a phishing site.
 
@@ -46,16 +46,16 @@ These factors, and others, combined with the non-Microsoft URL prove in no uncer
 
 When searching the website for more information, the website `hxxp://securedocument[.]net` redirects to `hxxp://securedocument[.]net/cgi-sys` which is a default cPanel page. 
 
-![screenshot of the default cPanel page](/images/blueteamlabs-phishyv1/phishy-05.png)
+![screenshot of the default cPanel page](https://imgur.com/j02pCbD.png)
 
 The source code of this page shows this page was actually copied from another website using HTTrack Website Copier.
 
-![screenshot of the default cPanel page source](/images/blueteamlabs-phishyv1/phishy-06.png)
+![screenshot of the default cPanel page source](https://imgur.com/EIA7v3o.png)
 
 Phishing operators will often redirect all non-phishing URLs to generic websites in an attempt to mislead analysts and automated scanning tools.
 The operator of the phishing website left a copy of the phishing kit in a `.zip` format at the URL `/secure`.
 
-![screenshot of /secure open directpry](/images/blueteamlabs-phishyv1/phishy-07.png)
+![screenshot of /secure open directpry](https://imgur.com/GJBgUHi.png)
 
 ```
 ubuntu@ip-10-0-3-0:~/Downloads$ sha256sum 0ff1cePh1sh.zip
@@ -64,11 +64,11 @@ ubuntu@ip-10-0-3-0:~/Downloads$ sha256sum 0ff1cePh1sh.zip
 
 The file `jeff.php` is used to process credentials submitted in the web form. The PHP source code shows that the credentials are being sent to the email address `boris.smets@tfl-uk[.]co`. On submission of the credentials, the victim is then redirected to the legitimate website `hxxps://www.office[.]com`.
 
-![contents of jeff.php](/images/blueteamlabs-phishyv1/phishy-08.png)
+![contents of jeff.php](https://imgur.com/76FPPnO.png)
 
 
 Requests for `index.html` result in a redirect to `index1.html` along with a URL parameter derived from the current time using the `getTime()` JavaScript function.
 
-![contents of index.html](/images/blueteamlabs-phishyv1/phishy-09.png)
+![contents of index.html](https://imgur.com/SYHGJYQ.png)
 
 This phishing website will not actually work as intended, so the operator will not receive any credentials. This is because in the HTML form on the main page, the email and password variables are being assigned the names `userrr` and `passss` respectively. However, `jeff.php` expects the variable names `user1` and `pass1` to be passed from the submitted form.
