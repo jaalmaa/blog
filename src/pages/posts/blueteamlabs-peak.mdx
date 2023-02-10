@@ -32,7 +32,7 @@ The investigation is carried out using the company's SIEM solution based on the 
 
 The host of interest, named `APPSERV-Chicago` is believed to be compromised. Fortunately, the Apache `access.log` parses the client IP address of the host connecting to the server, so this is a good starting point for gathering a list of the hosts that previously connected to the affected server.
 
-![source IPs](/images/blueteamlabs-peak/btl-peak-01.png)
+![source IPs](https://imgur.com/hnsjMev.png)
 
 A large volume of suspicious activity is observed from the IP address `10.0.2.5`, which is believed to be the address for the malicious actor as it deviates from the hosts expected to be connecting to this server. The only authorized host to access this server is the developer's laptop, which is in the subnet `192.168.1.0/24`. Therefore a deeper investigation into the activity carried out by this host is warranted.
 
@@ -46,9 +46,9 @@ Query: clientip: 10.0.2.5
 The aggregations in Kibana allow for a quick overview of the type of activity carried out by this suspicious host towards the webserver. 
 These are summarized below:
 
-![accessed endpoints](/images/blueteamlabs-peak/btl-peak-02.png)
+![accessed endpoints](https://imgur.com/tbknAkX.png)
 
-![user agents](/images/blueteamlabs-peak/btl-peak-03.png)
+![user agents](https://imgur.com/KEm2FuG.png)
 
 This activity indicates that, based on the user agent in the requests, the suspicious IP address is attempting to perform a brute-force attack on the WordPress login page for the webserver using the popular brute-force tool Hydra. The anomalous activity on the network is now confirmed as malicious activity.
 
@@ -61,7 +61,7 @@ Source: apache_logs
 Query: clientip: "10.0.2.5" and uri: "/blog/wp-login.php" and "302"
 ```
 
-![successful logins](/images/blueteamlabs-peak/btl-peak-04.png)
+![successful logins](https://imgur.com/2zQqVHx.png)
 
 There were no requests to the login page that resulted in a `HTTP 302` status code, which would have been expected following a successful login. Therefore, we can conclude that the attacker did not gain access to WordPress.
 
@@ -76,7 +76,7 @@ Source: auth
 Query: "Connection from 10.0.2.5"
 ```
 
-![attempted SSH logins](/images/blueteamlabs-peak/btl-peak-05.png)
+![attempted SSH logins](https://imgur.com/PcUuC0f.png)
 
 As the above screenshot shows, there are attempted SSH logins from the malicious IP address towards the server on port 44322. This must be the port on which the SSH server is listening.
 Furthermore, we can confirm whether or not the attacker was able to gain access to the server using the following query:
@@ -86,7 +86,7 @@ Source: auth
 Query: "10.0.2.5" and "Accepted"
 ```
 
-![successful SSH logins](/images/blueteamlabs-peak/btl-peak-06.png)
+![successful SSH logins](https://imgur.com/8iTT6V6.png)
 
 The threat actor was able to log in to the account `vagrant` on the server via SSH using a password. Therefore we can conclude that the malicious actor was able to successfully compromise the webserver. There were successful logins at the following times:
 
@@ -102,7 +102,7 @@ Source: auditd
 Query: type: "EXECVE" and not ("sed" or "awk")
 ```
 
-![issued commands](/images/blueteamlabs-peak/btl-peak-07.png)
+![issued commands](https://imgur.com/2EFDtc8.png)
 
 After searching from the time 10:07:06 onwards, the first human-looking command was run at 10:07:11 which was `ls --color=auto`. These commands are consistent with initial, host-based, reconaissance and information gathering. The following commands were executed following the SSH login:
 
@@ -118,7 +118,7 @@ Source: auditd
 Query: type: "EXECVE" and ("wget" or "curl")
 ```
 
-![linPEAS download](/images/blueteamlabs-peak/btl-peak-08.png)
+![linPEAS download](https://imgur.com/3LvjqF5.png)
 
 The threat actor downloaded `linpeas.sh`, which is a popular privilege escalation enumeration script. This script was downloaded using `wget` from the following URL:
 
@@ -128,17 +128,17 @@ hxxps://raw.githubusercontent[.]com/carlospolop/privilege-escalation-awesome-scr
 
 The script was then executed using `bash`.
 
-![linPEAS execution](/images/blueteamlabs-peak/btl-peak-09.png)
+![linPEAS execution](https://imgur.com/8EpedQa.png)
 
 ## Post Compromise - Privilege Escalation
 
 The attacker attempted to escalate privileges by downloading an exploit script from ExploitDB, which is a popular repository for publicly available exploit code, and saved it to the file `49521`.
 
-![exploit download](/images/blueteamlabs-peak/btl-peak-10.png)
+![exploit download](https://imgur.com/yfzfNVl.png)
 
 The exploit script downloaded can be found [here](https://www.exploit-db.com/exploits/49521). It is a script to exploit CVE-2021-3156, which is a vulnerability in `sudo 1.9.5p1` that allows for local privilege escalation on a vulnerable host. The attacker attempted to run the exploit to escalate privileges to the user account `root`.
 
-![exploit execution](/images/blueteamlabs-peak/btl-peak-11.png)
+![exploit execution](https://imgur.com/zsHIKih.png)
 
 List of commands run to execute the exploit code:
 
@@ -150,7 +150,7 @@ List of commands run to execute the exploit code:
 
 Following the attempt to escalate privileges, the attacker downloaded another script named `upload_btlo.sh` from their own infrastructure, that was proxied by leveraging the service Ngrok.
 
-![exfil script download](/images/blueteamlabs-peak/btl-peak-12.png)
+![exfil script download](https://imgur.com/sB2mR9p.png)
 
 Now we have a network indicator to pivot from to uncover further activity related to the attacker; `134430fcb321.ngrok[.]io`.
 
@@ -161,17 +161,17 @@ Query: type: "EXECVE" and "134430fcb321.ngrok.io"
 
 The threat actor uploaded the files `/etc/passwd` and `/tmp/btlo.zip` to URL `hxxps://134430fcb321.ngrok[.]io/upload` using the `curl` utility.
 
-![exfiltration](/images/blueteamlabs-peak/btl-peak-13.png)
+![exfiltration](https://imgur.com/SAL6IGW.png)
 
 The file `btlo.zip` contains the contents of the `/usr/share/wordpress`, which was compressed using the command `zip -e -r btlo.zip /usr/share/wordpress/*`.
 
-![btlo.zip compression](/images/blueteamlabs-peak/btl-peak-14.png)
+![btlo.zip compression](https://imgur.com/2gBAQ65.png)
 
 ## Post Compromise - Defense Evasion & Anti Forensics
 
 Following the successful exfiltration of files from the system, the attacker then proceeds to cover their tracks by deleting the files downloaded to the system.
 
-![deleting files](/images/blueteamlabs-peak/btl-peak-15.png)
+![deleting files](https://imgur.com/Z9tcDuM.png)
 
 The threat actor deleted the following files from the system:
 
