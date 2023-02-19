@@ -20,10 +20,10 @@ const recentPosts = posts.slice(0, 3);
 
 <Layout title="Jaalma's Blog">
   <main
-    class="m-auto w-11/12 object-contain text-center lg:px-8 xl:w-3/4 2xl:w-1/2 2xl:pt-24"
+    class="m-auto w-11/12 object-contain text-center lg:px-8 xl:w-3/4 2xl:w-3/4"
   >
     {/* Header */}
-    <h1 class="p-4 text-xl lg:text-6xl">
+    <h1 class="p-2 text-xl lg:text-4xl">
       Welcome to
       <span class="text-gradient font-medium">Jaalma's Blog.</span>
     </h1>
@@ -33,7 +33,7 @@ const recentPosts = posts.slice(0, 3);
     </div>
     {/* Recent Posts Section */}
     <div>
-      <h2 class="bg-clip-text lg:text-4xl">Recent Posts</h2>
+      <h2 class="bg-clip-text lg:text-2xl">Recent Posts</h2>
       <div class="min-h-fit lg:flex lg:flex-row">
         {recentPosts.slice(0, 2).map((post) => <PostCard post={post} />)}
       </div>
@@ -41,7 +41,7 @@ const recentPosts = posts.slice(0, 3);
     </div>
     {/* All posts button */}
     <div
-      class="m-auto my-4 flex w-full min-w-fit flex-row px-16 lg:w-2/3 2xl:w-1/2"
+      class="m-auto flex w-full min-w-fit flex-row px-16 lg:w-2/3 2xl:w-1/2"
     >
       <a
         href={`/posts/1`}
