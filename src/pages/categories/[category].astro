@@ -1,50 +1,62 @@
 ---
-import type { MDXInstance } from 'astro';
-import type { frontmatter } from '../index.astro';
-import Layout from '@layouts/Layout.astro';
-import PostCard from '@components/PostCard.astro';
-import TagsList from '@components/TagsList.astro';
-import HomeButton from '@components/HomeButton.astro';
+import type { MDXInstance } from "astro";
+import type { frontmatter } from "../index.astro";
+import Layout from "@layouts/Layout.astro";
+import PostCard from "@components/PostCard.astro";
+import TagsList from "@components/TagsList.astro";
+import HomeButton from "@components/HomeButton.astro";
 
 /* Generate static paths based on unique categories within posts */
 export async function getStaticPaths() {
-    const posts: MDXInstance<frontmatter>[] = await Astro.glob<frontmatter>('../posts/*.mdx');
-    let uniqueCategories = new Set();
-    posts.map((post: MDXInstance<frontmatter>) => {
-        if (post.frontmatter.categories) {
-            post.frontmatter.categories.map((category: string) => { uniqueCategories.add(category) });
-        }
-    });
-    const uniqueCategoriesList = Array.from(uniqueCategories);
-    return uniqueCategoriesList.map(category => ({
-        params: {
-            category
-        },
-        props: {
-            uniqueCategoriesList,
-            category,
-            posts
-        }
-    }));
-};
+  const posts: MDXInstance<frontmatter>[] = await Astro.glob<frontmatter>(
+    "../posts/*.mdx"
+  );
+  let uniqueCategories = new Set();
+  posts.map((post: MDXInstance<frontmatter>) => {
+    if (post.frontmatter.categories) {
+      post.frontmatter.categories.map((category: string) => {
+        uniqueCategories.add(category);
+      });
+    }
+  });
+  const uniqueCategoriesList = Array.from(uniqueCategories);
+  return uniqueCategoriesList.map((category) => ({
+    params: {
+      category,
+    },
+    props: {
+      uniqueCategoriesList,
+      category,
+      posts,
+    },
+  }));
+}
 const { uniqueCategoriesList, category, posts } = Astro.props;
-const filteredPosts = posts.filter((post: MDXInstance<frontmatter>) => post.frontmatter.categories.includes(category));
-filteredPosts.sort((a:MDXInstance<frontmatter>, b:MDXInstance<frontmatter>) => Date.parse(b.frontmatter.publishDate) - Date.parse(a.frontmatter.publishDate));
-const displayedCategory = category.replaceAll('-', ' ');
+const filteredPosts = posts.filter((post: MDXInstance<frontmatter>) =>
+  post.frontmatter.categories.includes(category)
+);
+filteredPosts.sort(
+  (a: MDXInstance<frontmatter>, b: MDXInstance<frontmatter>) =>
+    Date.parse(b.frontmatter.publishDate) -
+    Date.parse(a.frontmatter.publishDate)
+);
+const displayedCategory = category.replaceAll("-", " ");
 ---
 
 <Layout title={"Category: " + displayedCategory}>
-    <div class="lg:mx-72 px-2">   <!-- page container -->
-        <HomeButton to={ "/" } />
-        <h1 class="py-4 text-center text-gradient lg:text-5xl text-xl">Category: { displayedCategory }</h1>
-        <div class="p-4 hidden lg:block"> <!-- container for tag buttons, hidden on mobile -->
-            <p>All Categories:</p>
-            <TagsList categories={ uniqueCategoriesList } />
-        </div>
-        <div>
-            { filteredPosts.map((post: any) =>
-                <PostCard post={ post } />
-            ) }
-        </div>
+  <div class="lg:3/4 m-auto w-11/12 xl:w-2/3 2xl:w-1/2">
+    <!-- page container -->
+    <HomeButton to={"/"} />
+    <h1 class="text-gradient py-4 text-center text-xl lg:text-5xl">
+      Category: {displayedCategory}
+    </h1>
+    <div class="hidden p-4 lg:block">
+      <!-- container for tag buttons, hidden on mobile -->
+      <p>All Categories:</p>
+      <TagsList categories={uniqueCategoriesList} />
     </div>
+    <div>
+      {filteredPosts.map((post: any) => <PostCard post={post} />)}
+    </div>
+  </div>
 </Layout>

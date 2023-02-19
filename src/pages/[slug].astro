@@ -1,44 +1,53 @@
 ---
-import Layout from '@layouts/Layout.astro';
-import PostNav from '@components/PostNav.astro';
-import TagsList from '@components/TagsList.astro';
-import HomeButton from '@components/HomeButton.astro';
-import '../styles/post.css';
+import Layout from "@layouts/Layout.astro";
+import PostNav from "@components/PostNav.astro";
+import TagsList from "@components/TagsList.astro";
+import HomeButton from "@components/HomeButton.astro";
+import "../styles/post.css";
 
 export async function getStaticPaths() {
-    const posts = await Astro.glob('./posts/*.mdx');
-    return posts.map(post => ({
-        params: { slug: post.frontmatter.slug },
-        props: { post }
-    }));
+  const posts = await Astro.glob("./posts/*.mdx");
+  return posts.map((post) => ({
+    params: { slug: post.frontmatter.slug },
+    props: { post },
+  }));
 }
 
 const { Content, frontmatter } = Astro.props.post;
 /* get array of headings for building the article nav component */
 const headings: string[] = await Astro.props.post.getHeadings();
 /* Convert date in post frontmatter to date object render as a readable string */
-const readableDate: string[] = new Date(frontmatter.publishDate).toLocaleString().split(",").slice(0,1);
+const readableDate: string[] = new Date(frontmatter.publishDate)
+  .toLocaleString()
+  .split(",")
+  .slice(0, 1);
 ---
 
-<Layout title={ frontmatter.title }>
-    <div class="lg:flex lg:flex-row lg:mr-48 p-4">
-        <div class="lg:w-1/4 shadow-lg bg-purple-50 bg-opacity-30 rounded-2xl">
-            <PostNav headings={ headings } />
-        </div>
-        <article class="pt-8 lg:pl-48 lg:pr-48 lg:w-3/4">
-            <HomeButton to={ "/" } />
-            <div>
-                <h1 class="lg:text-6xl text-left">{ frontmatter.emoji }</h1>
-                <h1 class="lg:text-5xl text-2xl text-left text-gradient py-4">{ frontmatter.title }</h1>
-                <i class="text-gray-700">Published: { readableDate }</i>
-                <div>
-                    <TagsList categories={ frontmatter.categories } />
-                </div>
-            </div>
-            <hr class="border-2 mt-2 border-purple-400 drop-shadow-lg" />
-            <div class="py-12">
-                <Content />
-            </div>
-        </article>
+<Layout title={frontmatter.title}>
+  <div class="m-auto p-4 lg:flex lg:flex-row">
+    <div
+      class="rounded-2xl bg-purple-50 bg-opacity-30 shadow-lg lg:w-1/4 lg:min-w-fit 2xl:w-1/6"
+    >
+      <PostNav headings={headings} />
     </div>
+    <article
+      class="pt-8 lg:w-3/4 lg:px-48 xl:m-auto xl:w-2/3 2xl:m-auto 2xl:w-1/3 2xl:px-0"
+    >
+      <HomeButton to={"/"} />
+      <div>
+        <h1 class="text-left lg:text-6xl">{frontmatter.emoji}</h1>
+        <h1 class="text-gradient py-4 text-left text-2xl lg:text-5xl">
+          {frontmatter.title}
+        </h1>
+        <i class="text-gray-700">Published: {readableDate}</i>
+        <div>
+          <TagsList categories={frontmatter.categories} />
+        </div>
+      </div>
+      <hr class="mt-2 border-2 border-purple-400 drop-shadow-lg" />
+      <div class="py-12">
+        <Content />
+      </div>
+    </article>
+  </div>
 </Layout>

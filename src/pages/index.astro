@@ -1,45 +1,53 @@
 ---
 export interface frontmatter {
-	title: string
-	slug: string
-	publishDate: string
-	excerpt: string
-	categories: Array<string>
+  title: string;
+  slug: string;
+  publishDate: string;
+  excerpt: string;
+  categories: Array<string>;
 }
 
-import Layout from '@layouts/Layout.astro';
-import PostCard from '@components/PostCard.astro'
-const posts = await Astro.glob<frontmatter>('./posts/*.mdx');
-posts.sort((a, b) => Date.parse(b.frontmatter.publishDate) - Date.parse(a.frontmatter.publishDate));
+import Layout from "@layouts/Layout.astro";
+import PostCard from "@components/PostCard.astro";
+const posts = await Astro.glob<frontmatter>("./posts/*.mdx");
+posts.sort(
+  (a, b) =>
+    Date.parse(b.frontmatter.publishDate) -
+    Date.parse(a.frontmatter.publishDate)
+);
 const recentPosts = posts.slice(0, 3);
 ---
 
 <Layout title="Jaalma's Blog">
-	<main class="text-center lg:px-32">
-		{/* Header */}
-		<h1 class="lg:text-6xl text-xl p-4">Welcome to 
-			<span class="font-medium text-gradient">Jaalma's Blog.</span>
-		</h1>
-		{/* About Section */}
-		<div class="p-4 lg:text-xl text-gray-600">
-			<p>Digital forensics, malware analysis and all things blue team!</p>
-		</div>
-		{/* Recent Posts Section */}
-		<div>
-			<h2 class="bg-clip-text lg:text-4xl">Recent Posts</h2>
-			<div class="lg:flex lg:flex-row min-w-full min-h-fit">
-				{recentPosts.slice(0,2).map(post =>
-					<PostCard post={ post } />
-				)}
-			</div>
-			<PostCard post={ recentPosts[2] } />
-		</div>
-		{/* All posts button */}
-		<div class="p-12">
-			<a href={`/posts/1`} class="lg:px-64 lg:py-6 p-4 rounded-xl shadow-md sm:min-w-full
-				border-2 border-gray-200 text-gray-600
-				hover:bg-gradient-to-r hover:from-purple-400 hover:to-pink-600 hover:text-white hover:shadow-none hover:border-0 transition-all ease-in-out
-				font-medium">See All Posts</a>
-		</div>
-	</main>
+  <main
+    class="m-auto w-11/12 object-contain text-center lg:px-8 xl:w-3/4 2xl:w-1/2 2xl:pt-24"
+  >
+    {/* Header */}
+    <h1 class="p-4 text-xl lg:text-6xl">
+      Welcome to
+      <span class="text-gradient font-medium">Jaalma's Blog.</span>
+    </h1>
+    {/* About Section */}
+    <div class="p-4 text-gray-600 lg:text-xl">
+      <p>Digital forensics, malware analysis and all things blue team!</p>
+    </div>
+    {/* Recent Posts Section */}
+    <div>
+      <h2 class="bg-clip-text lg:text-4xl">Recent Posts</h2>
+      <div class="min-h-fit lg:flex lg:flex-row">
+        {recentPosts.slice(0, 2).map((post) => <PostCard post={post} />)}
+      </div>
+      <PostCard post={recentPosts[2]} />
+    </div>
+    {/* All posts button */}
+    <div
+      class="m-auto my-4 flex w-full min-w-fit flex-row px-16 lg:w-2/3 2xl:w-1/2"
+    >
+      <a
+        href={`/posts/1`}
+        class="min-w-full rounded-xl border-2 border-gray-200 p-4 text-gray-600 shadow-md transition-all ease-in-out hover:border-0 hover:bg-gradient-to-r hover:from-purple-400 hover:to-pink-600 hover:text-white hover:shadow-none"
+        >See All Posts</a
+      >
+    </div>
+  </main>
 </Layout>

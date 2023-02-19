@@ -1,34 +1,37 @@
 ---
-import type { frontmatter } from '../index.astro';
-import Layout from '@layouts/Layout.astro';
-import PostCard from '@components/PostCard.astro';
-import HomeButton from '@components/HomeButton.astro';
+import type { frontmatter } from "../index.astro";
+import Layout from "@layouts/Layout.astro";
+import PostCard from "@components/PostCard.astro";
+import HomeButton from "@components/HomeButton.astro";
 export async function getStaticPaths({ paginate }: any) {
-    const posts = await Astro.glob<frontmatter>('./*.mdx')
-    posts.sort((a, b) => Date.parse(b.frontmatter.publishDate) - Date.parse(a.frontmatter.publishDate));
+  const posts = await Astro.glob<frontmatter>("./*.mdx");
+  posts.sort(
+    (a, b) =>
+      Date.parse(b.frontmatter.publishDate) -
+      Date.parse(a.frontmatter.publishDate)
+  );
 
-    return paginate(posts, { pageSize: 5 })
+  return paginate(posts, { pageSize: 5 });
 }
 
 const { page } = Astro.props;
 ---
-<Layout title={ `All Posts | Page ${page.currentPage}` }>
-    <div class="lg:mx-72 px-2">
-        <HomeButton to={ "/" } />
-        <div class="text-center">
-            <h1 class="lg:text-5xl text-xl font-medium text-gradient py-2">
-                { page.url.prev ? `All Posts: Page ${ page.currentPage }` : "All Posts" }
-            </h1>
-            <div class="py-2">
-                <!-- Page Nav -->
-                { page.url.prev ? <a href={ page.url.prev }>{ "← Previous Page" }</a> : null }
-                { page.url.next ? <a href={ page.url.next }>{ "Next Page →" }</a> : null }
-            </div>
-            <div>
-                { page.data.map((post: any) =>
-                    <PostCard post={ post } />
-                )}
-            </div>
-        </div>
+
+<Layout title={`All Posts | Page ${page.currentPage}`}>
+  <div class="max-w-screen m-auto w-11/12 lg:w-3/4 xl:w-2/3 2xl:w-1/2">
+    <HomeButton to={"/"} />
+    <div class="text-center">
+      <h1 class="text-gradient py-2 text-xl font-medium lg:text-5xl">
+        {page.url.prev ? `All Posts: Page ${page.currentPage}` : "All Posts"}
+      </h1>
+      <div class="py-2">
+        <!-- Page Nav -->
+        {page.url.prev ? <a href={page.url.prev}>{"← Previous Page"}</a> : null}
+        {page.url.next ? <a href={page.url.next}>{"Next Page →"}</a> : null}
+      </div>
+      <div>
+        {page.data.map((post: any) => <PostCard post={post} />)}
+      </div>
     </div>
-</Layout> 
+  </div>
+</Layout>

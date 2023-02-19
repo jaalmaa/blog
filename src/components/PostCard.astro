@@ -3,21 +3,28 @@ import TagsList from "@components/TagsList.astro";
 const { post } = Astro.props;
 ---
 
-<div class="w-full min-h-fit lg:m-2 lg:border-2 lg:border-l-purple-200 lg:rounded-xl lg:border-white bg-white transition-all ease-in-out 
-    hover:bg-purple-100 hover:bg-opacity-40 hover:border-2 hover:border-purple-300">
-    <a href={`/${ post.frontmatter.slug }`}>
-        <div class="p-8 transition ease-in-out hover:translate-y-0.5 flex flex-col justify-between">
-            <div class="text-left">
-                <h3 class="text-xl font-medium">{ post.frontmatter.title }</h3>
-                <p class="text-gray-500 pb-2">Published: { post.frontmatter.publishDate.toLocaleString().split(" ").slice(0,1) }</p>
-                <hr class="border-1 border-purple-400 drop-shadow-lg" />
-            </div>
-            <div class="m-4 text-left">
-                <p class="line-clamp-3">{ post.frontmatter.excerpt }</p>
-            </div>
-            <div class="">
-                <TagsList categories={ post.frontmatter.categories } />
-            </div>
-        </div>
-    </a>
+<div
+  class="my-2 min-h-fit w-full rounded-xl bg-white transition-all ease-in-out hover:border-2 hover:border-purple-300 hover:bg-purple-100 hover:bg-opacity-40 lg:border-2 lg:border-white lg:border-l-purple-200"
+>
+  <a href={`/${post.frontmatter.slug}`}>
+    <div
+      class="flex flex-col justify-between p-8 transition ease-in-out hover:translate-y-0.5"
+    >
+      <div class="text-left">
+        <h3 class="text-xl font-medium">{post.frontmatter.title}</h3>
+        <p class="pb-2 text-gray-500">
+          Published: {
+            post.frontmatter.publishDate.toLocaleString().split(" ").slice(0, 1)
+          }
+        </p>
+        <hr class="border-1 border-purple-400 drop-shadow-lg" />
+      </div>
+      <div class="p-4 text-left">
+        <p class="line-clamp-3">{post.frontmatter.excerpt}</p>
+      </div>
+      <div class="">
+        <TagsList categories={post.frontmatter.categories} />
+      </div>
+    </div>
+  </a>
 </div>
