@@ -1,21 +1,20 @@
 ---
-title: 'BlueTeamLabs Investigation: Peak'
-emoji: '⛰️'
-slug: 'blueteamlabs-peak'
-publishDate: '2022-11-23 06:00:00'
-excerpt: 'In this scenario, a developer, Dwight, at a fictional company Mountain Top Solutions has noticed some anomalous activity on the application development server. It is our job as an analyst to investigate this anomalous activity to find evidence of a potential intrusion.'
-categories: ['BlueTeamLabs', 'Security-Operations']
+title: "BlueTeamLabs Investigation: Peak"
+emoji: "⛰️"
+url: "blueteamlabs-peak"
+publishDate: "2022-11-23 06:00:00"
+excerpt: "In this scenario, a developer, Dwight, at a fictional company Mountain Top Solutions has noticed some anomalous activity on the application development server. It is our job as an analyst to investigate this anomalous activity to find evidence of a potential intrusion."
+categories: ["BlueTeamLabs", "Security-Operations"]
 ---
 
 # Introduction
 
 In this scenario, a developer, Dwight, at a fictional company Mountain Top Solutions has noticed some anomalous activity on the application development server. It is our job as an analyst to investigate this anomalous activity to find evidence of a potential intrusion.
 
-
 Furthermore, the developer has given us the following leads to conduct our investigation:
 
-* The server should only be accessed from Dwight's laptop via SSH from the IP range `192.168.1.0/24`.
-* Anomalous activity has been observed from a host with the IP address `10.X.X.X`.
+- The server should only be accessed from Dwight's laptop via SSH from the IP range `192.168.1.0/24`.
+- Anomalous activity has been observed from a host with the IP address `10.X.X.X`.
 
 The following log sources were given for investigation:
 
@@ -43,7 +42,7 @@ Source: apache_log
 Query: clientip: 10.0.2.5
 ```
 
-The aggregations in Kibana allow for a quick overview of the type of activity carried out by this suspicious host towards the webserver. 
+The aggregations in Kibana allow for a quick overview of the type of activity carried out by this suspicious host towards the webserver.
 These are summarized below:
 
 ![accessed endpoints](https://imgur.com/tbknAkX.png)
@@ -52,7 +51,7 @@ These are summarized below:
 
 This activity indicates that, based on the user agent in the requests, the suspicious IP address is attempting to perform a brute-force attack on the WordPress login page for the webserver using the popular brute-force tool Hydra. The anomalous activity on the network is now confirmed as malicious activity.
 
-Each of these login attempts results in a `HTTP 200` response code, which indicates an unsuccessful login to the WordPress site. This may seem counterintuitive as a `200` status code indicates a successful response for a requested resource, however this corresponds to a successful request for the login page, which would be requested after a failed login. Instead, a successful login results in a `302` status code as the user is redirected to the Wordpress dashboard following a successful login. 
+Each of these login attempts results in a `HTTP 200` response code, which indicates an unsuccessful login to the WordPress site. This may seem counterintuitive as a `200` status code indicates a successful response for a requested resource, however this corresponds to a successful request for the login page, which would be requested after a failed login. Instead, a successful login results in a `302` status code as the user is redirected to the Wordpress dashboard following a successful login.
 
 The following query can be used to search for successful logins to the website from the malicious host:
 
@@ -90,8 +89,8 @@ Query: "10.0.2.5" and "Accepted"
 
 The threat actor was able to log in to the account `vagrant` on the server via SSH using a password. Therefore we can conclude that the malicious actor was able to successfully compromise the webserver. There were successful logins at the following times:
 
-* Feb 4, 2021 at 10:07:06
-* Feb 4, 2021 at 10:04:51
+- Feb 4, 2021 at 10:07:06
+- Feb 4, 2021 at 10:04:51
 
 ## Post Compromise - System Enumeration
 
@@ -106,10 +105,10 @@ Query: type: "EXECVE" and not ("sed" or "awk")
 
 After searching from the time 10:07:06 onwards, the first human-looking command was run at 10:07:11 which was `ls --color=auto`. These commands are consistent with initial, host-based, reconaissance and information gathering. The following commands were executed following the SSH login:
 
-* `ls --color=auto`
-* `id`
-* `uname -a`
-* `cat /etc/passwd`
+- `ls --color=auto`
+- `id`
+- `uname -a`
+- `cat /etc/passwd`
 
 The next thing to look for is any files downloaded by the attacker. On Linux systems, files are commonly downloaded from the internet using the commands wget or curl, so the following query is used to search for these commands:
 
@@ -142,9 +141,9 @@ The exploit script downloaded can be found [here](https://www.exploit-db.com/exp
 
 List of commands run to execute the exploit code:
 
-* `mv 49521 49521.py`
-* `python3 49521.py`
-* `python3 49521.py fakepasswd -target /etc/passwd`
+- `mv 49521 49521.py`
+- `python3 49521.py`
+- `python3 49521.py fakepasswd -target /etc/passwd`
 
 ## Post Compromise - Data Exfiltration
 
@@ -175,7 +174,7 @@ Following the successful exfiltration of files from the system, the attacker the
 
 The threat actor deleted the following files from the system:
 
-* `49521.py`
-* `btlo.zip`
-* `fakepasswd`
-* `linpeas.sh`
+- `49521.py`
+- `btlo.zip`
+- `fakepasswd`
+- `linpeas.sh`

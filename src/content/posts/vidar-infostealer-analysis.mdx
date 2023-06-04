@@ -1,10 +1,10 @@
 ---
-title: 'Analyzing a VIDAR Infostealer Sample'
-emoji: '🦹‍♀️'
-slug: 'vidar-infostealer-analysis'
-publishDate: '2022-12-31 06:00:00'
-excerpt: 'While reviewing samples submitted to Any.Run, I came across a recently-compiled binary that appeared to inject into a target process before performing some suspicious HTTP requests. After further analysis, this binary was found to be consistent with the VIDAR infostealer.'
-categories: ['Malware Analysis', 'Cybercrime']
+title: "Analyzing a VIDAR Infostealer Sample"
+emoji: "🦹‍♀️"
+url: "vidar-infostealer-analysis"
+publishDate: "2022-12-31 06:00:00"
+excerpt: "While reviewing samples submitted to Any.Run, I came across a recently-compiled binary that appeared to inject into a target process before performing some suspicious HTTP requests. After further analysis, this binary was found to be consistent with the VIDAR infostealer."
+categories: ["Malware Analysis", "Cybercrime"]
 ---
 
 # Introduction
@@ -16,9 +16,9 @@ Since this sample already had a dynamic, sandbox run within Any.Run, I decided t
 
 The sample being analyzed in this post has the following file hashes:
 
-* **MD5**: `9BB9FD7110158BEA15B3EB3881C52606`
-* **SHA1**: `F545BF2A5E310ED8E9A8F553DA11B5C03D859A79`
-* **SHA256**: `F2FEEFF2C03FE54E6F8415390CFA68671576D4CA598C127B5C73B60864E7372B`
+- **MD5**: `9BB9FD7110158BEA15B3EB3881C52606`
+- **SHA1**: `F545BF2A5E310ED8E9A8F553DA11B5C03D859A79`
+- **SHA256**: `F2FEEFF2C03FE54E6F8415390CFA68671576D4CA598C127B5C73B60864E7372B`
 
 &nbsp;
 
@@ -44,11 +44,11 @@ Based on the sandbox run, the binary appears to spawn a child process instance o
 
 The binary being analyzed has the following characteristics:
 
-* **MD5**: `9BB9FD7110158BEA15B3EB3881C52606`
-* **SHA1**: `F545BF2A5E310ED8E9A8F553DA11B5C03D859A79`
-* **SHA256**: `F2FEEFF2C03FE54E6F8415390CFA68671576D4CA598C127B5C73B60864E7372B`
-* **Compiled Timestamp**: `Fri Dec 23 14:09:41 2022 UTC`
-* **Linker**: `Linker GNU linker ld (GNU Binutils)`
+- **MD5**: `9BB9FD7110158BEA15B3EB3881C52606`
+- **SHA1**: `F545BF2A5E310ED8E9A8F553DA11B5C03D859A79`
+- **SHA256**: `F2FEEFF2C03FE54E6F8415390CFA68671576D4CA598C127B5C73B60864E7372B`
+- **Compiled Timestamp**: `Fri Dec 23 14:09:41 2022 UTC`
+- **Linker**: `Linker GNU linker ld (GNU Binutils)`
 
 The executable itself has very few imports, which indicates that there is some form of obfuscation going on to conceal the malware's true purpose and functionality.
 
@@ -60,15 +60,15 @@ This first loader works by XOR decrypting at runtime both the second stage malwa
 
 ## Second Stage Loader
 
-The second stage loader performs the process injection to load the final stage payload into memory. In this case, it used a *process hollowing but not really* approach to injecting the VIDAR binary into an `AppLaunch.exe` process.
+The second stage loader performs the process injection to load the final stage payload into memory. In this case, it used a _process hollowing but not really_ approach to injecting the VIDAR binary into an `AppLaunch.exe` process.
 
 The process injection method uses the following sequence of API calls:
 
-* `NtCreateUserProcess`
-* `VirtualAlloc`
-* `VirtualAllocEx`
-* `WriteProcessMemory`
-* `ResumeThread`
+- `NtCreateUserProcess`
+- `VirtualAlloc`
+- `VirtualAllocEx`
+- `WriteProcessMemory`
+- `ResumeThread`
 
 &nbsp;
 
@@ -77,8 +77,9 @@ Firstly, `NtCreateUserProcess` is called with the following arguments to spawn t
 ![ntcreateuserprocess arguments](https://imgur.com/PH6VhGC.png)
 
 `NtCreateUserProcess` is an undocumented function, however more information about this function can be found [here](https://captmeelo.com/redteam/maldev/2022/05/10/ntcreateuserprocess.html), and has been well documented by security researchers. For the purposes of this loader, two important arguments are passed:
-* `CreateThreadFlags`, which is set to `0x01`, and corresponds to starting the process in a suspended state.
-* `ProcessParameters`, which is a `RTL_USER_PROCESS_PARAMETERS` structure, and within it the image path `C:\Windows\Microsoft.NET\Framework\v4.0.30319\AppLaunch.exe` is provided.
+
+- `CreateThreadFlags`, which is set to `0x01`, and corresponds to starting the process in a suspended state.
+- `ProcessParameters`, which is a `RTL_USER_PROCESS_PARAMETERS` structure, and within it the image path `C:\Windows\Microsoft.NET\Framework\v4.0.30319\AppLaunch.exe` is provided.
 
 &nbsp;
 
@@ -92,9 +93,9 @@ Next, the loader calls both `VirtualAlloc` and `VirtualAllocEx` to allocate a re
 
 As per the documentation for these functions, both calls pass in the same arguments. The only difference being that `VirtualAlloc` is not provided a `lpAddress` pointer, which results in the function returning a pointer to the allocated memory region, whereas the `hProcess` argument provided to `VirtualAllocEx` is `0x009C`. Aside from those differences, the arguments provided to both functions are the same:
 
-* `dwSize`: `0x67000`, which corresponds to `421888` bytes.
-* `flAllocationType`: `0x03000`, which corresponds to both committing and reserving the address range in one step.
-* `flProtect`: `0x40`, which corresponds to read, write and execute (`RWX`) permissions.
+- `dwSize`: `0x67000`, which corresponds to `421888` bytes.
+- `flAllocationType`: `0x03000`, which corresponds to both committing and reserving the address range in one step.
+- `flProtect`: `0x40`, which corresponds to read, write and execute (`RWX`) permissions.
 
 &nbsp;
 
@@ -123,10 +124,10 @@ BOOL WriteProcessMemory(
 
 The arguments passed to `WriteProcessMemory` correspond to the following:
 
-* `hProcess`: `0x009C`, which is the same process handle passed into the previous `VirtualAllocEx` function call.
-* `lpBaseAddress`: `0x00400000`, which corresponds to the image base address in which the process memory is written.
-* `lpBuffer`: `0x02EA0000`
-* `nSize`: `0x67000`, which corresponds to the same `421888` bytes.
+- `hProcess`: `0x009C`, which is the same process handle passed into the previous `VirtualAllocEx` function call.
+- `lpBaseAddress`: `0x00400000`, which corresponds to the image base address in which the process memory is written.
+- `lpBuffer`: `0x02EA0000`
+- `nSize`: `0x67000`, which corresponds to the same `421888` bytes.
 
 &nbsp;
 
@@ -158,12 +159,12 @@ Since we now have an unmapped exectable, it is possible to reverse engineer and 
 
 Once the dumped payload has been realigned and otherwise fixed to become a valid portable executable, the second stage executable has the following characteristics:
 
-* **MD5**: `47a6959ac869f65dd31e65b1c80fa8b2`
-* **SHA1**: `f9d9ecf59523c202bca9ac4364b2a2042f116f32`
-* **SHA256**: `1521e9e7b06676a62e30e046851727fe4506bdf400bcf705a426f0f98fba5701`
-* **Compiled Timestamp**: `Mon Dec 19 12:33:40 2022 UTC`
-* **Compiler**: `Microsoft Visual C/C++`
-* **Linker**: `Microsoft Linker 10.0 - (Visual Studio 2010)`
+- **MD5**: `47a6959ac869f65dd31e65b1c80fa8b2`
+- **SHA1**: `f9d9ecf59523c202bca9ac4364b2a2042f116f32`
+- **SHA256**: `1521e9e7b06676a62e30e046851727fe4506bdf400bcf705a426f0f98fba5701`
+- **Compiled Timestamp**: `Mon Dec 19 12:33:40 2022 UTC`
+- **Compiler**: `Microsoft Visual C/C++`
+- **Linker**: `Microsoft Linker 10.0 - (Visual Studio 2010)`
 
 &nbsp;
 
@@ -178,55 +179,56 @@ A pointer to each string and module import can then be referenced by the malware
 The malware leverages the `BCryptDecrypt` API call to decode base64, and a custom-coded RC4 decryption function.
 
 **Cryptocurrency wallets and 2FA browser extensions and applications targeted by VIDAR**
+
 ```
 TronLink
 MetaMask
 BinanceChainWallet
-Yoroi 
+Yoroi
 NiftyWallet
 MathWallet
 Coinbase
-Guarda 
+Guarda
 EQUALWallet
 JaxxLiberty
 BitAppWallet
-iWallet 
-Wombat 
-MewCx 
+iWallet
+Wombat
+MewCx
 GuildWallet
 RoninWallet
-NeoLine 
+NeoLine
 CloverWallet
 LiqualityWallet
 Terra_Station
-Keplr 
-Sollet 
+Keplr
+Sollet
 AuroWallet
 PolymeshWallet
-ICONex 
-Harmony 
-Coin98 
+ICONex
+Harmony
+Coin98
 EVER Wallet
 KardiaChain
 Trezor Password Manager
-Rabby 
+Rabby
 Phantom
 BraveWallet
 Oxygen (Atomic)
 PaliWallet
-BoltX 
+BoltX
 XdefiWallet
 NamiWallet
 MaiarDeFiWallet
 WavesKeeper
 Solflare
 CyanoWallet
-KHC 
-TezBox 
-Temple 
-Goby 
+KHC
+TezBox
+Temple
+Goby
 Authenticator
-Authy 
+Authy
 EOS Authenticator
 GAuth Authenticator
 Tronium
@@ -268,6 +270,7 @@ SOFTWARE\monero-project\monero-core,\Monero\
 Also encrypted in the binary are the SQL queries used to harvest data stored in web browsers:
 
 **SQL queries used by VIDAR to harvest browser data**
+
 ```
 SELECT origin_url, username_value, password_value FROM logins
 SELECT name, value FROM autofill
@@ -283,13 +286,13 @@ In addition, one of the encrypted strings, `C:\ProgramData\` is the staging dire
 
 The malware stores its C2 servers in an unencrypted format within the binary:
 
-* `hxxps://t[.]me/traduttoretg`
-* `hxxps://steamcommunity[.]com/profiles/76561199445991535`
-* `hxxp://5.75.253[.]16:80`
+- `hxxps://t[.]me/traduttoretg`
+- `hxxps://steamcommunity[.]com/profiles/76561199445991535`
+- `hxxp://5.75.253[.]16:80`
 
 &nbsp;
 
-Interestingly, the VIDAR malware leverages legitimate services to host C2 configuration data. For example, the *Telegram* and *Steam* profile links contain IP addresses, whereas the `5.75.253[.]16` appears to be consistent with threat actor infrastructure. This way, the malware operators can contiunously cycle C2 servers and have the malware beacon back to each new IP address so long as the social media profiles hosting the C2 IP address remain active.
+Interestingly, the VIDAR malware leverages legitimate services to host C2 configuration data. For example, the _Telegram_ and _Steam_ profile links contain IP addresses, whereas the `5.75.253[.]16` appears to be consistent with threat actor infrastructure. This way, the malware operators can contiunously cycle C2 servers and have the malware beacon back to each new IP address so long as the social media profiles hosting the C2 IP address remain active.
 
 ![steam profile](https://imgur.com/U8sOgzt.png)
 ![telegram profile](https://imgur.com/X7f4Z8l.png)
@@ -301,6 +304,7 @@ This particular VIDAR sample uses the string `grundic` to identify where on the 
 Once the malware has retrieved a C2 IP address from one of the social media profiles hardcoded within the binary, it then submits a HTTP `GET` request containing the profile ID of the affiliate. Since the VIDAR malware is sold as an infostealer-as-a-service where the cybercriminal [gains access to a control panel](https://any.run/malware-trends/vidar) to configure and generate the malware, this ID is used to retrieve the configuration data set by the VIDAR customer. In this sample, the profile ID is `1375`.
 
 **VIDAR configuration retrieved**
+
 ```
 1,1,1,1,1,36bfd46626a0b531909b016919dd1fbd,1,1,1,1,0,Default;%DOCUMENTS%\;*.txt;50;true;movies:music:mp3;desktop;%DESKTOP%\;*.txt:*.doc:*.docx:*.xlsx:*.xlsm:*.xls:*.pptx;950;true;movies:music:mp3:exe;
 ```
@@ -328,12 +332,12 @@ MD5 (vcruntime140.dll) = 7587bf9cb4147022cd5681b015183046
 
 ## Data Exfiltration
 
-
 The harvested data is then sent back to the C2 server using a HTTP `POST` request.
 
 ![IDA post](https://imgur.com/unQribv.png)
 
 **HTTP `POST` body**
+
 ```
 ------1531306219445135
 Content-Disposition: form-data; name="profile"
@@ -363,6 +367,7 @@ Interestingly, the token `36bfd46626a0b531909b016919dd1fbd` matches the string c
 The data harvested from the host is stored within the ZIP file in the `POST` request body.
 
 **Directory structure of the ZIP file**
+
 ```
 /History/Mozilla Firefox_qldyz51w.default.txt
 /Cookies/Google Chrome_Default.txt

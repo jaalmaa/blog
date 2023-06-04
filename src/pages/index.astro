@@ -9,11 +9,12 @@ export interface frontmatter {
 
 import Layout from "@layouts/Layout.astro";
 import PostCard from "@components/PostCard.astro";
-const posts = await Astro.glob<frontmatter>("./posts/*.mdx");
+import { getCollection } from "astro:content";
+const posts = await getCollection("posts");
 posts.sort(
   (a, b) =>
-    Date.parse(b.frontmatter.publishDate) -
-    Date.parse(a.frontmatter.publishDate)
+    Date.parse(new Date(b.data.publishDate).toLocaleString()) -
+    Date.parse(new Date(a.data.publishDate).toLocaleString())
 );
 const recentPosts = posts.slice(0, 3);
 ---
@@ -22,7 +23,6 @@ const recentPosts = posts.slice(0, 3);
   <main
     class="m-auto w-11/12 object-contain text-center lg:px-8 xl:w-3/4 2xl:w-3/4"
   >
-    {/* Header */}
     <h1 class="p-2 text-xl lg:text-4xl">
       Welcome to
       <span class="text-gradient font-medium">Jaalma's Blog.</span>
@@ -31,7 +31,6 @@ const recentPosts = posts.slice(0, 3);
     <div class="p-4 text-gray-600 lg:text-xl">
       <p>Digital forensics, malware analysis and all things blue team!</p>
     </div>
-    {/* Recent Posts Section */}
     <div>
       <h2 class="bg-clip-text lg:text-2xl">Recent Posts</h2>
       <div class="min-h-fit lg:flex lg:flex-row">
@@ -39,10 +38,7 @@ const recentPosts = posts.slice(0, 3);
       </div>
       <PostCard post={recentPosts[2]} />
     </div>
-    {/* All posts button */}
-    <div
-      class="m-auto flex w-full min-w-fit flex-row px-16 lg:w-2/3 2xl:w-1/2"
-    >
+    <div class="m-auto flex w-full min-w-fit flex-row px-16 lg:w-2/3 2xl:w-1/2">
       <a
         href={`/posts/1`}
         class="min-w-full rounded-xl border-2 border-gray-200 p-4 text-gray-600 shadow-md transition-all ease-in-out hover:border-0 hover:bg-gradient-to-r hover:from-purple-400 hover:to-pink-600 hover:text-white hover:shadow-none"

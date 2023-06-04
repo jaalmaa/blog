@@ -6,25 +6,23 @@ const { post } = Astro.props;
 <div
   class="my-2 min-h-fit w-full rounded-xl bg-white transition-all ease-in-out hover:border-2 hover:border-purple-300 hover:bg-purple-100 hover:bg-opacity-40 lg:border-2 lg:border-white lg:border-l-purple-200"
 >
-  <a href={`/${post.frontmatter.slug}`}>
+  <a href={`/${post.data.url}`}>
     <div
       class="flex flex-col justify-between p-8 transition ease-in-out hover:translate-y-0.5"
     >
       <div class="text-left">
-        <h3 class="text-xl font-medium">{post.frontmatter.title}</h3>
+        <h3 class="text-xl font-medium">{post.data.title}</h3>
         <p class="pb-2 text-gray-500">
           Published: {
-            post.frontmatter.publishDate.toLocaleString().split(" ").slice(0, 1)
+            post.data.publishDate.toLocaleString().split(" ").slice(0, 1)
           }
         </p>
         <hr class="border-1 border-purple-400 drop-shadow-lg" />
       </div>
       <div class="p-4 text-left">
-        <p class="line-clamp-3">{post.frontmatter.excerpt}</p>
+        <p class="line-clamp-3">{post.data.excerpt}</p>
       </div>
-      <div class="">
-        <TagsList categories={post.frontmatter.categories} />
-      </div>
+      <TagsList categories={post.data.categories} />
     </div>
   </a>
 </div>

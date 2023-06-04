@@ -1,14 +1,13 @@
 ---
 interface Props {
-    categories: string[]
+  categories: string[];
 }
 
 import Tag from "@components/Tag.astro";
 const { categories } = Astro.props;
 ---
 
-<div class="lg:flex flex-row flex-wrap-reverse justify-end h-full">
-    {categories.map((category: string) =>
-        <Tag text={ category } />
-    )}
+<div class="h-full flex-wrap-reverse lg:flex lg:flex-row lg:justify-end">
+  <p class="lg:pt-4">Categories:</p>
+  {categories.map((category: string) => <Tag text={category} />)}
 </div>

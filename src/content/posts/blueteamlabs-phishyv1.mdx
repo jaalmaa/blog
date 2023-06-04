@@ -1,10 +1,10 @@
 ---
-title: 'BlueTeamLabs Investigation: Phishy V1'
-emoji: '🎣'
-slug: 'blueteamlabs-phishyv1'
-publishDate: '2022-12-06 06:00:00'
-excerpt: 'You have been sent a phishing link — It is your task to investigate this website and find out everything you can about the site, the actor responsible, and perform threat intelligence work on the operator(s) of the phishing site.'
-categories: ['BlueTeamLabs', 'Security-Operations']
+title: "BlueTeamLabs Investigation: Phishy V1"
+emoji: "🎣"
+url: "blueteamlabs-phishyv1"
+publishDate: "2022-12-06 06:00:00"
+excerpt: "You have been sent a phishing link — It is your task to investigate this website and find out everything you can about the site, the actor responsible, and perform threat intelligence work on the operator(s) of the phishing site."
+categories: ["BlueTeamLabs", "Security-Operations"]
 ---
 
 # Introduction
@@ -29,7 +29,6 @@ Viewing the page's HTML code reveals a suspicious PHP file named `jeff.php` to w
 
 ![screenshot of the HTML page source](https://imgur.com/QYVa3G7.png)
 
-
 The HTML comments contain the phrase `Thanks to PHP Bloke`. This text would good to use as a pivot to uncover other phishing websites in the wild using this kit, or similar.
 
 If we view the source for the webpage CSS at `style.css`. The background behind the login form is actually an image named `axCBhIt.png`, not any HTML content.
@@ -44,7 +43,7 @@ These factors, and others, combined with the non-Microsoft URL prove in no uncer
 
 ## Phishing Kit
 
-When searching the website for more information, the website `hxxp://securedocument[.]net` redirects to `hxxp://securedocument[.]net/cgi-sys` which is a default cPanel page. 
+When searching the website for more information, the website `hxxp://securedocument[.]net` redirects to `hxxp://securedocument[.]net/cgi-sys` which is a default cPanel page.
 
 ![screenshot of the default cPanel page](https://imgur.com/j02pCbD.png)
 
@@ -65,7 +64,6 @@ ubuntu@ip-10-0-3-0:~/Downloads$ sha256sum 0ff1cePh1sh.zip
 The file `jeff.php` is used to process credentials submitted in the web form. The PHP source code shows that the credentials are being sent to the email address `boris.smets@tfl-uk[.]co`. On submission of the credentials, the victim is then redirected to the legitimate website `hxxps://www.office[.]com`.
 
 ![contents of jeff.php](https://imgur.com/76FPPnO.png)
-
 
 Requests for `index.html` result in a redirect to `index1.html` along with a URL parameter derived from the current time using the `getTime()` JavaScript function.
 

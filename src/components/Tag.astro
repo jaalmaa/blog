@@ -1,9 +1,14 @@
 ---
+interface Props {
+  text: string;
+}
 const { text } = Astro.props;
 ---
 
 <a href={`/categories/${text}`}>
-    <div class="py-2 px-4 m-2 shadow-lg max-w-fit whitespace-nowrap rounded-xl font-medium hover:shadow-none border-purple-400 border-2 text-purple-400 hover:text-white hover:bg-purple-400 hover:transition-all ease-in-out">
-        {text.replaceAll('-', ' ')}
-    </div>
+  <div
+    class="m-2 max-w-fit whitespace-nowrap rounded-xl border-2 border-purple-400 py-2 px-4 font-medium text-purple-400 shadow-lg ease-in-out hover:bg-purple-400 hover:text-white hover:shadow-none hover:transition-all"
+  >
+    {text.replaceAll("-", " ")}
+  </div>
 </a>
