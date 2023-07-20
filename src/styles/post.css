@@ -1,119 +1,122 @@
 html {
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
 
 article {
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    text-align: left;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    width: 100%;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  text-align: left;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  width: 100%;
 }
 
 h1 {
-    font-size: 2.5rem;
-    font-weight: 400;
-    padding-bottom: 0.5rem;
-    padding-top: 2.5rem;
-    text-align: center;
+  font-size: 2.5rem !important;
+  font-weight: 400;
+  padding-bottom: 0.5rem;
+  padding-top: 2.5rem;
+  text-align: center;
 }
 
 h2 {
-    font-size: 2rem;
-    padding-top: 1.5rem;
-    padding-bottom: 0.5rem;
+  font-size: 2rem !important;
+  padding-top: 1.5rem;
+  padding-bottom: 0.5rem;
 }
 
 h3 {
-    font-size: 1.5rem;
-    padding-bottom: 0.25rem;
-    padding-top: 0.25rem;
+  font-size: 1.5rem !important;
+  padding-bottom: 0.25rem;
+  padding-top: 0.25rem;
 }
 
 p {
-    font-size: medium;
-    color: rgb(59, 69, 78);
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    line-height: 1.75rem;
+  font-size: medium;
+  color: rgb(59, 69, 78);
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  line-height: 1.75rem;
 }
 
 hr {
-    border-bottom: 1rem;
+  border-bottom: 1rem;
 }
 
 pre {
-    background-color: white !important;
-    font-size: medium;
-    padding: 1rem;
-    padding-left: 1.5rem;
-    overflow-wrap: break-all;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-    line-height: 1.5rem;
-    border-radius: 1.5rem;
-    border: 2px solid rgb(207, 178, 236);
-    white-space: pre-wrap;
-    overflow-wrap: break-word;
-    box-shadow: #222;
-    --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
-    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  background-color: white !important;
+  font-size: medium;
+  padding: 1rem;
+  padding-left: 1.5rem;
+  overflow-wrap: break-all;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  line-height: 1.5rem;
+  border-radius: 1.5rem;
+  border: 2px solid rgb(207, 178, 236);
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  box-shadow: #222;
+  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color),
+    0 2px 4px -2px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
+    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
 span {
-    color: rgb(107 33 168) !important;
-    overflow-wrap: break-word;
+  color: rgb(107 33 168) !important;
+  overflow-wrap: break-word;
 }
 
 img {
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-    display: block;
-    margin-left:auto;
-    margin-right: auto;
-    max-width: 100%;
-    box-shadow: #222;
-    --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
-    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 100%;
+  box-shadow: #222;
+  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color),
+    0 2px 4px -2px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
+    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
 ul {
-    list-style: none;
-    padding-left: 2rem;
-    color: rgb(107 33 168) !important;
-    font-size: medium;
+  list-style: none;
+  padding-left: 2rem;
+  color: rgb(107 33 168) !important;
+  font-size: medium;
 }
 
 ul li::before {
-    content: "\2022";
-    color: rgb(146, 50, 243);
-    font-weight: bold;
-    display: inline-block;
-    width: 3rem;
-    margin: 0.2rem;
-  }
+  content: "\2022";
+  color: rgb(146, 50, 243);
+  font-weight: bold;
+  display: inline-block;
+  width: 3rem;
+  margin: 0.2rem;
+}
 
 a {
-    color:rgb(146, 50, 243)
+  color: rgb(146, 50, 243);
 }
 
 a:hover {
-    color: rgb(168, 97, 238);
+  color: rgb(168, 97, 238);
 }
 
 p > code {
-    color: rgb(107 33 168) !important;
-    border: 2px solid rgb(207, 178, 236);
-    border-radius: 0.5rem;
-    padding: 0rem 0.4rem;
-    
+  color: rgb(107 33 168) !important;
+  border: 2px solid rgb(207, 178, 236);
+  border-radius: 0.5rem;
+  padding: 0rem 0.4rem;
 }
 
 li > code {
-    color: rgb(107 33 168) !important;
-    border: 2px solid rgb(207, 178, 236);
-    border-radius: 0.5rem;
-    padding: 0.125rem 0.4rem;
+  color: rgb(107 33 168) !important;
+  border: 2px solid rgb(207, 178, 236);
+  border-radius: 0.5rem;
+  padding: 0.125rem 0.4rem;
 }

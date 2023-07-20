@@ -2,13 +2,19 @@
 const { headings } = Astro.props;
 ---
 
-<div class="w-full p-4 sticky top-16 rounded-xl">
-    <p class="text-center font-medium text-xl text-gradient">On this page</p>
-    { headings.map((heading: any) => 
-        <a href={`#${heading.slug}`}>
-            <div class="hover:text-white hover:bg-purple-100 transition ease-in-out hover:translate-x-0.5 rounded-2xl px-2">
-                { heading.depth === 1 ? <p class="lg:text-xl">{ heading.text }</p> : <p class="ml-8 hidden lg:block">{ heading.text }</p> }
-            </div>
-        </a>
-    )}
+<div class="sticky top-16 w-full rounded-xl p-4">
+  <p class="text-gradient text-center text-xl font-medium">On this page</p>
+  {
+    headings.map((heading: any) => (
+      <a href={`#${heading.slug}`}>
+        <div class="rounded-2xl px-2 transition ease-in-out hover:translate-x-0.5 hover:bg-purple-100 hover:text-white">
+          {heading.depth === 1 ? (
+            <p class="lg:text-xl">{heading.text}</p>
+          ) : (
+            <p class="ml-8 hidden lg:block">{heading.text}</p>
+          )}
+        </div>
+      </a>
+    ))
+  }
 </div>
