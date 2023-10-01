@@ -1,0 +1,333 @@
+---
+title: "Analyzing DARKGATE Part 1: Background & Unpacking"
+emoji: "🌉"
+url: "darkgate-part-1-unpacking"
+publishDate: "2023-10-01 06:00:00"
+excerpt: "In August and September of 2023, public reporting of the DARKGATE malware increased following its increased prevalence and distribution."
+categories: ["Malware Analysis", "Cybercrime"]
+---
+
+# DARKGATE Lore
+
+## Where did it come from?
+
+In June of 2023, advertisements for DARKGATE began appearing on cybercrime forums for _"the ultimate tool for pentesters/redteamers"_ that had begun development in 2017.
+
+![Darkgate Forum Post](https://imgur.com/ytdd3nv.png)
+
+_Image courtesy of [Telekom](https://github.security.telekom.com/2023/08/darkgate-loader.html)_
+
+The forum posts advertise a multitude of features including cryptocurrency mining, data theft, in-memory payload execution, remote desktop and remote access tool deployment.
+
+The author charged approximately $15,000 per month, or $100,000 per year for access and maintains "exclusivity" by restricting access to ten affiliates.
+
+Once purchased, the affiliate is then provided access to a portal with a payload configurator where they can generate a DARKGATE payload and choose various features such as anti-VM checks, remote desktop functionality etc., and a Cobalt Strike Teamserver-like interface to interact with compromised hosts.
+
+While DARKGATE has garnered increased reporting from August 2023 onwards, earlier versions of DARKGATE have been reported on as early as Late November, 2018.
+[Research from TrendMicro](https://www.fortinet.com/blog/threat-research/enter-the-darkgate-new-cryptocurrency-mining-and-ransomware-campaign) identified that the earlier versions of DARKGATE from around that time had significant code overlap with the GOLROTED malware; a simple keylogger used by Nigerian scammers who targeted small and medium-sized businesses on 2015.
+
+DARKGATE also appeared to make a resurgence in September 2020, when it was dubbed [MehCrypter](https://decoded.avast.io/janrubin/complex-obfuscation-meh/).
+This particular iteration contains notable overlap in the techniques used, most notably the XOR key derivation routine, with the sample analyzed in this post.
+
+## Where did it go?
+
+In September 2023, DARKGATE recieved attention following multiple reports being published on [the use of Microsoft Teams](https://www.truesec.com/hub/blog/darkgate-loader-delivered-via-teams) for distribution.
+
+Recent reporting has pointed to [phishing](https://www.truesec.com/hub/blog/darkgate-loader-delivered-via-teams), [malvertising](https://thrunter.medium.com/bing-malvertisements-for-sysadmin-tool-deliver-darkgate-5b82f5e2a925) and [SEO poisoning](https://www.malwarebytes.com/blog/threat-intelligence/2023/08/darkgate-reloaded-via-malvertising-campaigns) each being used to distribute DARKGATE, which gives credence to the use of this malware by multiple affiliates; each with their own _modus operandi_.
+
+![darkgate distribution diagram](https://imgur.com/I7JXTnF.png)
+
+_Current DARKGATE distribution mechanisms as of September 2023._
+
+# DARKGATE Gameplay
+
+## AutoIt3 Payload
+
+The sample being analyzed is `pgnfvp.au3` (MD5: `d03befdbe32c5bb2511aa0eadb2ad943`).
+
+### Decompiling the AutoIt3 Payload
+
+While the file extension utilized in the DARKGATE distribution is `.au3`, the payload inside it is, in fact, compiled AutoIt3 data, typically indicated by the `.a3x` file extension.
+This is substantiated by the existence of the magic bytes `AU3!EA06`, which serves as a signature for a compiled AutoIt3 payload.
+
+![Compiled AutoIt3 Magic Bytes](https://imgur.com/1jZ6OjX.png)
+_Magic Bytes for a Compiled AutoIt3 File_
+
+After changing the file extension from `.au3` to `.a3x`, the compiled AutoIt3 payload can be decompiled using myAut2Exe.
+
+**Decompiled and Deobfuscated AutoIt3 Payload**
+
+```
+#NoTrayIcon
+FUNC DECRYPTFILEWITHKEY($SFILEPATH,$SKEY)
+	LOCAL $HFILE=FILEOPEN($SFILEPATH,16)
+	IF $HFILE=-1 THEN
+		MSGBOX(0,"Error","unable to open.")
+		RETURN SETERROR(1,0,"")
+	ENDIF
+	LOCAL $BCONTENT=FILEREAD($HFILE)
+	FILECLOSE($HFILE)
+	LOCAL $SCONTENT=BINARYTOSTRING($BCONTENT)
+	LOCAL $ISTART=STRINGINSTR($SCONTENT,"padoru")+6
+	LOCAL $IEND=STRINGINSTR($SCONTENT,"padoru",0,-1,$ISTART)
+	IF $ISTART=6 OR $IEND=0 THEN
+		MSGBOX(0,"Error","delimiter not found.")
+		RETURN SETERROR(2,0,"")
+	ENDIF
+	LOCAL $STODECRYPT=STRINGMID($SCONTENT,$ISTART,$IEND-$ISTART)
+	LOCAL $BTODECRYPT=STRINGTOBINARY($STODECRYPT)
+	LOCAL $IBLOCKSIZE=32768
+	LOCAL $ILEN=BINARYLEN($BTODECRYPT)
+	LOCAL $TBYTE=DLLSTRUCTCREATE("byte[1]")
+	LOCAL $IKEYALT=0,$B_DECRYPTED=BINARY("")
+	LOCAL $IKEYLEN=STRINGLEN($SKEY)
+	FOR $I=1 TO $IKEYLEN
+		$IKEYALT=BITXOR(BINARYMID($SKEY,$I,1),$IKEYALT)
+	NEXT
+	FOR $I=1 TO $ILEN STEP $IBLOCKSIZE
+		LOCAL $IBLOCKLEN=$IBLOCKSIZE
+		IF $I+$IBLOCKLEN>$ILEN THEN $IBLOCKLEN=$ILEN-$I+1
+		LOCAL $BBLOCK=BINARYMID($BTODECRYPT,$I,$IBLOCKLEN)
+		LOCAL $BDECRYPTEDBLOCK=BINARY("")
+			FOR $J=1 TO BINARYLEN($BBLOCK)
+				EXECUTE("DllStructSetData($tByte, 1, BitXOR(BinaryMid($bBlock, $j, 1), $iKeyAlt))")
+				$BDECRYPTEDBLOCK&=DLLSTRUCTGETDATA($TBYTE,1)
+			NEXT
+		$B_DECRYPTED&=$BDECRYPTEDBLOCK
+	NEXT
+	RETURN $B_DECRYPTED
+ENDFUNC
+
+LOCAL $SKEY="darkgate"
+LOCAL $SDECRYPTEDCONTENT=DECRYPTFILEWITHKEY(@SCRIPTFULLPATH,$SKEY)
+$LRFHTFLDQX=$SDECRYPTEDCONTENT
+$PVWOVMUJBA=DLLSTRUCTCREATE("byte["&BINARYLEN($LRFHTFLDQX)&"]")
+```
+
+The decrypted shellcode bytes are subsequently stored and invoked via a DLL struct using native AutoIt3 functions to facilitate this functionality.
+
+&nbsp;
+
+### Retrieving the Loader Shellcode
+
+The shellcode decoding within this AutoIt3 sample differs from that in other posts analyzing this malware. In this sample, the script retrieves the encrypted shellcode bytes between two occurrences of the delimiter string `padoru` within the same file.
+
+```
+LOCAL $SCONTENT=BINARYTOSTRING($BCONTENT)
+LOCAL $ISTART=STRINGINSTR($SCONTENT,"padoru")+6
+LOCAL $IEND=STRINGINSTR($SCONTENT,"padoru",0,-1,$ISTART)
+IF $ISTART=6 OR $IEND=0 THEN
+	MSGBOX(0,"Error","delimiter not found.")
+	RETURN SETERROR(2,0,"")
+ENDIF
+LOCAL $STODECRYPT=STRINGMID($SCONTENT,$ISTART,$IEND-$ISTART)
+LOCAL $BTODECRYPT=STRINGTOBINARY($STODECRYPT)
+```
+
+In other reports, the AutoIt3 code concatenates hardcoded strings containing the shellcode hex bytes to form the next payload stage.
+
+The encrypted payload bytes are then decrypted by XORing with a byte derived from the key `darkgate` in the following code snippet:
+
+```
+LOCAL $IKEYLEN=STRINGLEN($SKEY)
+FOR $I=1 TO $IKEYLEN
+	$IKEYALT=BITXOR(BINARYMID($SKEY,$I,1),$IKEYALT)
+NEXT
+```
+
+Where `$SKEY` is `darkgate`.
+
+An equivalent routine written in Python would be:
+
+```python
+# key = b'darkgate'
+def create_xor_key(key: bytes):
+    xor_key = 0
+    for i in range(len(key)):
+        xor_key ^= key[i]
+    return xor_key
+```
+
+In samples using this method for retrieving the shellcode, it is very likely that the key derivation string `darkgate`, and the delimiter `padoru` will change from sample to sample.
+
+### Shellcode Extractor
+
+The following shellcode extractor was written to retrieve second stage shellcode bytes:
+
+```python
+def read_encrypted_bytes(delimeter: bytes, encrypted_bytes: bytes):
+    return encrypted_bytes.split(delimeter)[1]
+
+def create_xor_key(key: bytes):
+    xor_key = 0
+    key_length = len(key)
+    for i in range(key_length):
+        xor_key ^= key[i]
+    return xor_key
+
+def decrypt_bytes(encrypted_data: bytes, key: bytes):
+    enc_bytes_length = len(encrypted_data)
+    block_size = 4
+    decrypted_bytes = bytearray()  # Initialize an empty byte array to store the decrypted data
+
+    for i in range(0, enc_bytes_length, block_size):
+        if i + block_size > enc_bytes_length:
+            block_size = enc_bytes_length - i
+        byte_block = encrypted_data[i:i + block_size]
+        decrypted_byte_block = bytearray()
+        for j in range(len(byte_block)):
+            decrypted_byte = byte_block[j] ^ key
+            decrypted_byte_block.append(decrypted_byte)
+        decrypted_bytes.extend(decrypted_byte_block)  # Append the decrypted block to the result
+
+    # decrypted_bytes now contains the decrypted data
+    return decrypted_bytes
+
+def write_bytes_to_file(bytes: bytes, filename: str):
+    with open(filename, "wb") as output_file:
+        output_file.write(bytes)
+    return
+
+
+# -----------------------------------------------------------------------------
+INPUT_FILE = "PATH_TO_AUTOIT3_FILE"
+KEY = b"KEY_FROM_DECOMPILED_AUTOIT3_SCRIPT"
+DELIMETER = b"DELIMETER_FROM_DECOMPILED_AUTOIT3_SCRIPT"
+OUTPUT_FILE = "PATH_TO_OUTPUT_FILE"
+
+with open(INPUT_FILE, 'rb') as f:
+    file_bytes = f.read()
+key = create_xor_key(KEY)
+enc_bytes = read_encrypted_bytes(DELIMETER, file_bytes)
+decrypted_bytes = decrypt_bytes(enc_bytes, key)
+write_bytes_to_file(decrypted_bytes, OUTPUT_FILE)
+```
+
+_DARKGATE AutoIt3 Shellcode Extractor_
+
+## Analyzing the DARKGATE Loader Shellcode
+
+Upon decrypting the shellcode, a sanity check was performed using FLOSS to confirm its correctness.
+The FLOSS output unveiled multiple stack strings consistent with Windows API functions, libraries and other noteworthy strings.
+
+**FLOSS output from the decrypted shellcode**
+
+```
+FLARE FLOSS RESULTS (version v2.1.0-0-gbf2bf1c)
+----------------------------
+| FLOSS STACK STRINGS (87) |
+----------------------------
+\tTFileName
+TSearchRecX
+c:\temp\s
+AU3!EA06
+kernel32.dll
+GetCurrentThreadId
+ExitProcess
+UnhandledExceptionFilter
+RtlUnwind
+RaiseException
+GetCommandLineA
+TlsSetValue
+TlsGetValue
+LocalAlloc
+GetModuleHandleA
+GetModuleFileNameA
+FreeLibrary
+HeapFree
+HeapReAlloc
+HeapAlloc
+GetProcessHeap
+user32.dll
+CharNextA
+oleaut32.dll
+SysFreeString
+SysReAllocStringLen
+lread
+lopen
+_lclose
+VirtualAlloc
+Sleep
+SetCurrentDirectoryA
+ReadFile
+LoadLibraryA
+GetProcAddress
+GetLastError
+GetFileSize
+FindNextFileA
+FindFirstFileA
+FindClose
+FileTimeToLocalFileTime
+FileTimeToDosDateTime
+DeleteFileA
+CreateFileA
+CloseHandle
+loader
+UTypes
+System
+SysInit
+VU_UnionApi
+hU_MemExecute
+KWindows
+AAccCtrl
+u_CustomBase64
+AclAPI
+DVCLAL
+PACKAGEINFO
+```
+
+Now that the output had been validated to be valid shellcode, Shellcode2Exe was used to create an executable to run the decrypted shellcode for both static and dynamic analysis.
+
+Static analysis of the Shellcode2Exe executable within IDA revealed the following series of steps used to load the next payload stage:
+
+- Sequentially move the payload bytes for the next stage into memory. The instructions for moving each byte are not sequential in terms of memory address, and are mixed-up.
+- Dynamically resolve the API functions `LoadLibraryA` and `VirtualAlloc`, which are stored as stack strings.
+- Allocate a **1MB** region in memory with read, write and execute privileges using `VirtualAlloc`.
+- Copy the bytes for the next executable stage, section by section into the newly created memory region.
+- Loop and import the necessary DLL libraries needed for the next payload stage using `LoadLibraryA`.
+- Jump to the memory region containing the mapped executable to execute the next payload stage.
+
+![IDA-shellcode-api-stackstrings](https://imgur.com/ZD4Z2QQ.png)
+_Stack strings for `VirtualAlloc` and `LoadLibraryA`_
+
+![Set up VirtualAlloc Call](https://imgur.com/f2czthB.png)
+_Setup for the `VirtualAlloc` Call_
+
+![Map next payload stage to memory](https://imgur.com/YBhPgeh.png)
+_Mapping the next stage executable into the memory region created by `VirtualAlloc`_
+
+![Switch execution flow over to the next payload stage](https://imgur.com/imaxwdl.png)
+_Switch execution flow over to the next payload stage_
+
+As shown in the below screenshot, the next payload stage can be dumped in an unmapped format after the bytes had been written to memory, and before the payload is mapped into the region created by `VirtualAlloc`. This is fortunate as there is no need to manually unmap the dumped executable.
+
+![dumping written executable](https://imgur.com/3ioMPox.png)
+_Shellcode writing the next payload stage into memory_
+
+## Additional Loading Stage
+
+This payload stage functions as a DLL loader, coded in Delphi. It relies on the original malicious `.au3` file as a command line argument and retrieves the filename using the `GetCommandLineA` function.
+It then scans the file for the presence of the bytes `AU3!EA06`. If the validation succeeds, the loader proceeds to decrypt and load the bytes for the final payload stage into a memory region allocated using `VirtualAlloc`.
+
+This means that breakpoints can be set on calls to `VirtualAlloc`, and each allocated memory region can be monitored for the final payload stage being written to it.
+Therefore, the final payload stage can be dumped for further analysis before any process injection has taken place.
+
+![final payload stage being written to memory](https://imgur.com/NgJgy2p.png)
+_The final, fully unpacked, DARKGATE malware being written to memory_
+
+Next, the loader injects the final DARKGATE payload into a newly-spawned process instance of `C:\Program Data\Google\Update\GoogleUpdate.exe`.
+An interesting defense evasion technique used by this loader is to spoof the parent process of the injection target using `UpdateProcThreadAttribute`.
+
+The malware first enumerates running processes using `CreateToolhelp32Snapshot`, `Process32First` and `Process32Next`, before acquiring a handle to a parent process selected at random. This allows the process ID of the spoofed parent to be obtained.
+
+![spoofing parent process](https://imgur.com/gQX4NJh.png)
+_Leveraging `UpdateProcThreadAttribute` to spoof the PPID for the injection target_
+
+## Final DARKGATE Payload
+
+The payload dumped from the previous stage is consistent with a fully unpacked DARKGATE malware.
+
+![pestudio-strings](https://imgur.com/fS9o0MH.png)
+
+![ida-strings-1](https://imgur.com/vssPV8d.png)
+![ida-strings-2](https://imgur.com/pPBvxIc.png)
