@@ -315,7 +315,7 @@ Therefore, the final payload stage can be dumped for further analysis before any
 ![final payload stage being written to memory](https://imgur.com/NgJgy2p.png)
 _The final, fully unpacked, DARKGATE malware being written to memory_
 
-Next, the loader injects the final DARKGATE payload into a newly-spawned process instance of `C:\Program Data\Google\Update\GoogleUpdate.exe`.
+Next, the loader injects the final DARKGATE payload into a newly-spawned process instance of `C:\Program Files (x86)\Google\Update\GoogleUpdate.exe`.
 An interesting defense evasion technique used by this loader is to spoof the parent process of the injection target using `UpdateProcThreadAttribute`.
 
 The malware first enumerates running processes using `CreateToolhelp32Snapshot`, `Process32First` and `Process32Next`, before acquiring a handle to a parent process selected at random. This allows the process ID of the spoofed parent to be obtained.
